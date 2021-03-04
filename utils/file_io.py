@@ -10,6 +10,7 @@ from subprocess import call
 import requests
 import win32api
 
+CONFIG = {}
 
 # for send2trash
 class SHFILEOPSTRUCTW(Structure):
@@ -53,18 +54,44 @@ def send2trash(path):
     return result  # 0 means success
 
 
-def get_config(path) -> dict:
+def read_config(path) -> dict:
     # 路径合法性检测
     if not os.path.isfile(path):
         print("配置文件不存在：" + path)
         return {}
     config = configparser.ConfigParser()
     config.optionxform = str  # key case sensitive
-    config.read(path, encoding="utf-8")
-    # config_dict = config._sections
-    # for key in config_dict:
-    #     config_dict[key] = dict(config_dict[key])
+    try:
+        config.read(path, encoding="utf-8")
+    except Exception as e:
+        print(e)
+        print("配置文件有误：" + path)
+        return {}
     return config._sections
+
+
+def update_config(path):
+    global CONFIG
+    CONFIG = read_config(path)
+    if not CONFIG:
+        return -1
+    # 将proxy配置项转换为字典格式
+    if "common" in CONFIG and "proxy" in CONFIG["common"] and CONFIG["common"]["proxy"]:
+        CONFIG["common"]["proxy_dict"] = {
+            "http": CONFIG["common"]["proxy"],
+            "https": CONFIG["common"]["proxy"],
+        }
+    else:
+        CONFIG["common"]["proxy_dict"] = {}
+    return 0
+
+
+def get_config(section, key):
+    if section in CONFIG:
+        return CONFIG[section].get(key, "")
+    else:
+        print("配置文件中 " + section + " 项不存在！")
+        return ""
 
 
 def terminate_process(name, confirm=False):
@@ -86,7 +113,7 @@ def terminate_process(name, confirm=False):
 def get_exe_version(path):
     # 路径合法性检测
     if not os.path.isfile(path):
-        print("目标目录不存在：" + path)
+        print("目标文件不存在：" + path)
         return "0.0.0.0"
 
     try:
@@ -181,6 +208,19 @@ def downloader(url, file_path, proxy_dict={}, silent=False):
                             ),
                             end="",
                         )
+                    else:  # 避免过于频繁的print
+                        percent = float(size / file_size * 100)
+                        # 百分比为整十（精确到小数点后1位）才会print，且避免重复
+                        percent_10x = int(percent * 10)
+                        if "percent_10x_last" not in dir():  # 未定义变量（第一次循环）
+                            percent_10x_last = -1
+                        if percent_10x % 100 == 0 and percent_10x != percent_10x_last:
+                            print(
+                                "[下载进度]: %s%.2f%%"
+                                % (">" * int(size * 50 / file_size), percent)
+                            )
+                            percent_10x_last = percent_10x
+
         end_time = time.time()
         if not silent:
             print("")

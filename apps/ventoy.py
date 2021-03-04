@@ -8,26 +8,20 @@ from utils.github_release import GitHubRelease
 
 # https://github.com/ventoy/Ventoy
 
-PROXY_DICT = {"http": "http://127.0.0.1:7890", "https": "http://127.0.0.1:7890"}
-LOCAL_DIR = r"E:\GreenSoft\Utilities\ventoy (多系统U盘启动盘制作)"
+ID = "ventoy"
 REPO = "ventoy/Ventoy"
-# RELEASE_FILE_NAME = "ventoy-0.0.0.0-windows.zip"
 TMP_DIR = os.environ.get("TEMP")
-
 WHITE_LIST = [
     "manual_for_ventoy_with_secure_boot.png",
     "secure_cn.png",
     "Ventoy2Disk.ini",
 ]
-release_name = ""
 
 app = GitHubRelease(REPO)
-app.local_dir = LOCAL_DIR
-app.exe_path = os.path.join(LOCAL_DIR, "Ventoy2Disk.exe")
 
 
 def get_ventoy_version():
-    path = os.path.join(LOCAL_DIR, "ventoy/version")
+    path = os.path.join(app.local_dir, "ventoy/version")
     local_version = "0.0.0.0"
     try:
         with open(path, "r") as f:
@@ -37,23 +31,48 @@ def get_ventoy_version():
     return local_version
 
 
-def init():
+def init(check_release=True):
+    app.local_dir = file_io.get_config(ID, "path")
+    if not os.path.isdir(app.local_dir):
+        print('本地目录配置有误："' + app.local_dir + '" 不存在！')
+        return
+    app.exe_path = os.path.join(app.local_dir, "Ventoy2Disk.exe")
     app.local_version = get_ventoy_version()
-    app.check_release(False, PROXY_DICT)
-    # Release 文件名包含版本号
-    global release_name
-    release_name = "ventoy-" + str(app.latest_version[1:])
-    app.release_file_name = release_name + "-windows.zip"
-    app.release_file_url = app.get_download_url()
+    include_pre = file_io.get_config(ID, "pre_release")
+    if include_pre:
+        try:
+            include_pre = int(include_pre)
+        except:
+            print("[%s] Pre-release 开关配置有误" % ID)
+            include_pre = 0
+    if check_release:
+        app.check_release(
+            include_pre,
+            file_io.get_config("common", "proxy_dict"),
+            file_io.get_config("common", "github_oauth"),
+        )
+        # Release 文件名包含版本号
+        # 在配置文件中用$代替
+        global release_name
+        release_name = file_io.get_config(ID, "release_file").replace(
+            "$", str(app.latest_version[1:])
+        )
+        app.release_file_name = release_name
+        app.release_file_url = app.get_download_url()
 
 
 def update(silent=False):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
-    if file_io.downloader(app.release_file_url, tmp_file, PROXY_DICT, silent):
+    if file_io.downloader(
+        app.release_file_url,
+        tmp_file,
+        file_io.get_config("common", "proxy_dict"),
+        silent,
+    ):
         return -1
-    file_io.empty_dir_interact(LOCAL_DIR, True, WHITE_LIST, not silent)
-    file_io.unpack_zip(tmp_file, LOCAL_DIR)
-    file_io.cut_dir(os.path.join(LOCAL_DIR, release_name), LOCAL_DIR)
+    file_io.empty_dir_interact(app.local_dir, True, WHITE_LIST, not silent)
+    file_io.unpack_zip(tmp_file, app.local_dir)
+    file_io.cut_dir(os.path.join(app.local_dir, release_name), app.local_dir)
     app.local_version = get_ventoy_version()
     if app.is_latest() == 1:
         os.remove(tmp_file)
@@ -65,5 +84,7 @@ def update(silent=False):
 
 
 if __name__ == "__main__":
+    if file_io.update_config("../config.ini"):
+        exit(1)
     init()
     app.update_interact(update)

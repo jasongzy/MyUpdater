@@ -10,15 +10,11 @@ from utils.github_release import GitHubRelease
 
 # https://github.com/JustArchiNET/ArchiSteamFarm
 
-PROXY_DICT = {"http": "http://127.0.0.1:7890", "https": "http://127.0.0.1:7890"}
-LOCAL_DIR = r"E:\GreenSoft\Entertainment\ArchiSteamFarm (Steam云挂卡)"
+ID = "asf"
 REPO = "JustArchiNET/ArchiSteamFarm"
-RELEASE_FILE_NAME = "ASF-win-x64.zip"
 TMP_DIR = os.environ.get("TEMP")
 
-app = GitHubRelease(REPO, RELEASE_FILE_NAME)
-app.local_dir = LOCAL_DIR
-app.exe_path = os.path.join(LOCAL_DIR, "ArchiSteamFarm.exe")
+app = GitHubRelease(REPO)
 
 
 # def get_asf_version():
@@ -34,18 +30,41 @@ app.exe_path = os.path.join(LOCAL_DIR, "ArchiSteamFarm.exe")
 #     return local_version
 
 
-def init():
+def init(check_release=True):
+    app.release_file_name = file_io.get_config(ID, "release_file")
+    app.local_dir = file_io.get_config(ID, "path")
+    if not os.path.isdir(app.local_dir):
+        print('本地目录配置有误："' + app.local_dir + '" 不存在！')
+        return
+    app.exe_path = os.path.join(app.local_dir, "ArchiSteamFarm.exe")
     # app.local_version = get_asf_version()
     app.local_version = file_io.get_exe_version(app.exe_path)
-    app.check_release(False, PROXY_DICT)
+    include_pre = file_io.get_config(ID, "pre_release")
+    if include_pre:
+        try:
+            include_pre = int(include_pre)
+        except:
+            print("[%s] Pre-release 开关配置有误" % ID)
+            include_pre = 0
+    if check_release:
+        app.check_release(
+            include_pre,
+            file_io.get_config("common", "proxy_dict"),
+            file_io.get_config("common", "github_oauth"),
+        )
 
 
 def update(silent=False):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
-    if file_io.downloader(app.release_file_url, tmp_file, PROXY_DICT, silent):
+    if file_io.downloader(
+        app.release_file_url,
+        tmp_file,
+        file_io.get_config("common", "proxy_dict"),
+        silent,
+    ):
         return -1
-    file_io.empty_dir_interact(LOCAL_DIR, True, [], not silent)
-    file_io.unpack_zip(tmp_file, LOCAL_DIR)
+    file_io.empty_dir_interact(app.local_dir, True, [], not silent)
+    file_io.unpack_zip(tmp_file, app.local_dir)
     # app.local_version = get_asf_version()
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:
@@ -58,5 +77,7 @@ def update(silent=False):
 
 
 if __name__ == "__main__":
+    if file_io.update_config("../config.ini"):
+        exit(1)
     init()
     app.update_interact(update)

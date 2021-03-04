@@ -3,8 +3,6 @@ import json
 import requests
 
 GITHUB_API = "https://api.github.com"
-OAUTH_TOKEN = "b6bca04f941f0c2b93668cca10e2f90c58c38414"
-headers = {"Authorization": "token " + OAUTH_TOKEN}
 
 
 def _version_compare(a: str, b: str, split="."):
@@ -27,6 +25,34 @@ def _version_compare(a: str, b: str, split="."):
     return 0
 
 
+def oauth_test(oauth_token, proxy_dict={}):
+    # 0: OAuth ok
+    # 1: no OAuth
+    # -1: failed
+    api = GITHUB_API + "/rate_limit"
+    headers = {"Authorization": "token " + oauth_token}
+    try:
+        response = requests.get(
+            api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10,
+        )
+    except requests.exceptions.ReadTimeout:
+        print("Request timeout")
+        return -1
+    except Exception as e:
+        print(e)
+        return -1
+    if response.status_code == requests.codes.ok:
+        json_dict = json.loads(response.content)
+        limit = json_dict["resources"]["core"]["limit"]
+        if int(limit) >= 5000:
+            return 0
+        else:
+            return 1
+    else:
+        print("Request failed: %d" % response.status_code)
+        return -1
+
+
 class GitHubRelease:
     local_dir = ""
     exe_path = ""
@@ -41,17 +67,15 @@ class GitHubRelease:
     release_body = ""
     release_file_url = ""
 
-    def __init__(self, repo, release_file_name=""):
+    def __init__(self, repo):
         self.repo = repo
         self.repo_url = "https://github.com/" + repo
-        self.release_file_name = release_file_name
 
-    def check_release(self, include_pre=False, proxy_dict={}):
-        api = ""
+    def check_release(self, include_pre=False, proxy_dict={}, oauth_token=""):
+        api = GITHUB_API + "/repos/" + self.repo + "/releases"
+        headers = {"Authorization": "token " + oauth_token} if oauth_token else {}
         if not include_pre:
-            api = GITHUB_API + "/repos/" + self.repo + "/releases/latest"
-        else:
-            api = GITHUB_API + "/repos/" + self.repo + "/releases"
+            api += "/latest"
         try:
             response = requests.get(
                 api,

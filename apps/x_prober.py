@@ -8,23 +8,16 @@ from utils.github_release import GitHubRelease
 
 # https://github.com/kmvan/x-prober
 
-PROXY_DICT = {"http": "http://127.0.0.1:7890", "https": "http://127.0.0.1:7890"}
-LOCAL_DIR = r"E:\Tech\Linux\Server"
+ID = "xprober"
 REPO = "kmvan/x-prober"
-RELEASE_FILE_NAME = "prober.php"
-# TMP_DIR = os.environ.get("TEMP")
 
-current_filename = ""
-
-
-app = GitHubRelease(REPO, RELEASE_FILE_NAME)
-app.local_dir = LOCAL_DIR
+app = GitHubRelease(REPO)
 
 
 def get_prober_version():
     local_version = "0.0.0.0"
     global current_filename
-    for item in os.listdir(LOCAL_DIR):
+    for item in os.listdir(app.local_dir):
         if item.startswith("xprober_") and (not item.endswith(".old")):
             current_filename = item
     if not current_filename:
@@ -38,15 +31,38 @@ def get_prober_version():
     return local_version
 
 
-def init():
+def init(check_release=True):
+    app.release_file_name = file_io.get_config(ID, "release_file")
+    app.local_dir = file_io.get_config(ID, "path")
+    if not os.path.isdir(app.local_dir):
+        print('本地目录配置有误："' + app.local_dir + '" 不存在！')
+        return
     app.local_version = get_prober_version()
-    app.check_release(False, PROXY_DICT)
+    app.exe_path = os.path.join(app.local_dir, current_filename)
+    include_pre = file_io.get_config(ID, "pre_release")
+    if include_pre:
+        try:
+            include_pre = int(include_pre)
+        except:
+            print("[%s] Pre-release 开关配置有误" % ID)
+            include_pre = 0
+    if check_release:
+        app.check_release(
+            include_pre,
+            file_io.get_config("common", "proxy_dict"),
+            file_io.get_config("common", "github_oauth"),
+        )
 
 
 def update(silent=False):
-    old_file = os.path.join(LOCAL_DIR, current_filename)
-    new_file = os.path.join(LOCAL_DIR, "xprober_" + app.latest_version + ".php")
-    if file_io.downloader(app.release_file_url, new_file, PROXY_DICT, silent):
+    old_file = os.path.join(app.local_dir, current_filename)
+    new_file = os.path.join(app.local_dir, "xprober_" + app.latest_version + ".php")
+    if file_io.downloader(
+        app.release_file_url,
+        new_file,
+        file_io.get_config("common", "proxy_dict"),
+        silent,
+    ):
         return -1
     os.rename(old_file, old_file + ".old")
     old_file += ".old"
@@ -61,5 +77,7 @@ def update(silent=False):
 
 
 if __name__ == "__main__":
+    if file_io.update_config("../config.ini"):
+        exit(1)
     init()
     app.update_interact(update)

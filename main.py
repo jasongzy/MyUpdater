@@ -4,7 +4,9 @@ import sys
 from PyQt5.QtCore import (
     QCoreApplication,
     QEventLoop,
+    QFileSystemWatcher,
     QObject,
+    QProcess,
     Qt,
     QThread,
     QTimer,
@@ -26,6 +28,7 @@ from PyQt5.QtWidgets import (
     QHeaderView,
     QLabel,
     QMainWindow,
+    QMessageBox,
     QTableWidgetItem,
 )
 
@@ -34,6 +37,7 @@ import apps.clash_for_windows as cfw
 import apps.ventoy as ventoy
 import apps.waifu2x_extension_gui as waifu
 import apps.x_prober as xprober
+import utils.file_io as file_io
 from Ui_updater import Ui_MainWindow
 
 COL_LOGO = 0
@@ -73,6 +77,7 @@ LOGO_DICT = dict(
 )
 APP_LIST = [asf, cfw, ventoy, waifu, xprober]
 APP_DICT = dict(zip(ROW_LIST, APP_LIST))
+CONFIG_PATH = "./config.ini"
 
 
 class MyThread(QThread):
@@ -152,6 +157,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.thread_init_dict[item].finished.connect(self.update_ui)
             self.thread_update_dict[item] = MyThread(item, "update")
             self.thread_update_dict[item].finished.connect(self.update_ui_all)
+            # 初始化各个APP的基本信息，但不检查更新
+            APP_DICT[item].init(False)
         # 添加表格内容
         row_index = 0  # 避免在循环内调用ROW_LIST.index(item)获取行号
         for item in ROW_LIST:
@@ -239,7 +246,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.checked_list = []  # 记录检查完毕的item
         self.counter_num = 0
 
-        # 初始化定时器
+        # 实时监测config.ini的改动
+        self.config_watcher = QFileSystemWatcher()
+        self.config_watcher.addPath(CONFIG_PATH)
+        self.config_watcher.fileChanged.connect(self.config_changed)
+
+        # 定时器用于在窗口显示后执行任务
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.window_showed)
         self.timer.start(1000)
@@ -334,6 +346,22 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         for item in ROW_LIST:
             self.update_ui(item, False)
 
+    def config_changed(self):
+        self.config_watcher.removePath(CONFIG_PATH)
+        choice = QMessageBox.information(
+            self,
+            "配置文件已修改",
+            "新配置将在软件重启后生效\n是否重新启动？",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+        if choice == QMessageBox.Yes:
+            MainApp.quit()
+            # 重启
+            QProcess.startDetached(QApplication.applicationFilePath())
+        else:
+            self.config_watcher.addPath(CONFIG_PATH)
+
     def window_showed(self):
         self.timer.stop()
         print("启动完成，自动检查更新...")
@@ -348,7 +376,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    MainApp = QApplication(sys.argv)
+    if file_io.update_config(CONFIG_PATH):
+        QMessageBox.critical(None, "错误", "配置文件存在严重错误，\n请修正后再启动！")
+        QDesktopServices.openUrl(QUrl.fromLocalFile(CONFIG_PATH))
+        sys.exit()
     MainWindow = MyMainWindow()
     MainWindow.show()
-    sys.exit(app.exec_())
+    sys.exit(MainApp.exec_())
