@@ -1,3 +1,4 @@
+import configparser
 import os
 import shutil
 import time
@@ -50,6 +51,20 @@ def send2trash(path):
     fileop.lpszProgressTitle = None
     result = SHFileOperationW(byref(fileop))
     return result  # 0 means success
+
+
+def get_config(path) -> dict:
+    # 路径合法性检测
+    if not os.path.isfile(path):
+        print("配置文件不存在：" + path)
+        return {}
+    config = configparser.ConfigParser()
+    config.optionxform = str  # key case sensitive
+    config.read(path, encoding="utf-8")
+    # config_dict = config._sections
+    # for key in config_dict:
+    #     config_dict[key] = dict(config_dict[key])
+    return config._sections
 
 
 def terminate_process(name, confirm=False):

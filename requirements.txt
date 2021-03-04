@@ -1,5 +1,3 @@
 pyqt5
 requests
 pywin32
-lxml
-configparser

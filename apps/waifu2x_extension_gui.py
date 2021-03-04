@@ -5,7 +5,6 @@ import sys
 from time import sleep
 
 sys.path.append("..")
-import configparser
 
 import utils.file_io as file_io
 from utils.github_release import GitHubRelease
@@ -20,8 +19,7 @@ TMP_DIR = os.environ.get("TEMP")
 
 PATH_IDM = r"E:\GreenSoft\Network\Internet Download Manager\IDMan.exe"
 PATH_7Z = r"E:\GreenSoft\Portable\PortableApps\PortableApps\\7-ZipPortable\App\\7-Zip64\\7z.exe"
-config = configparser.ConfigParser()
-config_path = os.path.join(LOCAL_DIR, r"waifu2x-extension-gui\settings.ini")
+waifu_config_path = os.path.join(LOCAL_DIR, r"waifu2x-extension-gui\settings.ini")
 
 app = GitHubRelease(REPO)
 app.local_dir = LOCAL_DIR
@@ -33,8 +31,8 @@ app.exe_path = os.path.join(
 def get_waifu_version():
     local_version = "0.0.0.0"
     try:
-        config.read(config_path)
-        local_version = config["settings"]["VERSION"]
+        waifu_config = file_io.get_config(waifu_config_path)
+        local_version = waifu_config["settings"]["VERSION"]
     except:
         print("未找到 Waifu2x Extension GUI 当前版本！")
     return local_version
