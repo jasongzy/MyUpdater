@@ -25,14 +25,15 @@ def get_prober_version():
     local_version = "0.0.0.0"
     global current_filename
     for item in os.listdir(LOCAL_DIR):
-        if item.startswith("xprober"):
+        if item.startswith("xprober_") and (not item.endswith(".old")):
             current_filename = item
     if not current_filename:
         print("未找到 X Prober 当前版本！")
     else:
-        try:
-            local_version = os.path.splitext(current_filename)[0].split("_")[1]
-        except:
+        version = os.path.splitext(current_filename)[0].split("_")[1]
+        if version:
+            local_version = version
+        else:
             print("未找到 X Prober 当前版本！")
     return local_version
 
@@ -47,6 +48,8 @@ def update(silent=False):
     new_file = os.path.join(LOCAL_DIR, "xprober_" + app.latest_version + ".php")
     if file_io.downloader(app.release_file_url, new_file, PROXY_DICT, silent):
         return -1
+    os.rename(old_file, old_file + ".old")
+    old_file += ".old"
     app.local_version = get_prober_version()
     if app.is_latest() == 1:
         os.remove(old_file)
