@@ -1,4 +1,3 @@
-#!G:\Programs\anaconda3\envs\pytest\python.exe
 import os
 import sys
 

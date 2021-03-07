@@ -1,4 +1,3 @@
-#!G:\Programs\anaconda3\envs\pytest\python.exe
 import os
 import sys
 
@@ -53,11 +52,9 @@ def init(check_release=True):
         )
         # Release 文件名包含版本号
         # 在配置文件中用$代替
-        global release_name
-        release_name = file_io.get_config(ID, "release_file").replace(
+        app.release_file_name = file_io.get_config(ID, "release_file").replace(
             "$", str(app.latest_version[1:])
         )
-        app.release_file_name = release_name
         app.release_file_url = app.get_download_url()
 
 
@@ -72,7 +69,10 @@ def update(silent=False):
         return -1
     file_io.empty_dir_interact(app.local_dir, True, WHITE_LIST, not silent)
     file_io.unpack_zip(tmp_file, app.local_dir)
-    file_io.cut_dir(os.path.join(app.local_dir, release_name), app.local_dir)
+    file_io.cut_dir(
+        os.path.join(app.local_dir, "ventoy-" + str(app.latest_version[1:])),
+        app.local_dir,
+    )
     app.local_version = get_ventoy_version()
     if app.is_latest() == 1:
         os.remove(tmp_file)
