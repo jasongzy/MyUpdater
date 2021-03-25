@@ -33,6 +33,8 @@ from PyQt5.QtWidgets import (
 
 import apps.archi_steam_farm as asf
 import apps.clash_for_windows as cfw
+import apps.drawio_desktop as drawio
+import apps.office_tool_plus as otp
 import apps.ventoy as ventoy
 import apps.waifu2x_extension_gui as waifu
 import apps.x_prober as xprober
@@ -48,13 +50,15 @@ COL_GITHUB_BUTTON = 5
 COL_PATH_BUTTON = 6
 COL_UPDATE_BUTTON = 7
 
-ROW_LIST = ["asf", "cfw", "ventoy", "waifu", "xprober"]
+ROW_LIST = ["asf", "cfw", "drawio", "otp", "ventoy", "waifu", "xprober"]
 NAME_DICT = dict(
     zip(
         ROW_LIST,
         [
             "ArchiSteamFarm",
             "Clash for Windows",
+            "draw.io Desktop",
+            "Office Tool Plus",
             "Ventoy",
             "Waifu2x Extension GUI",
             "X Prober",
@@ -68,13 +72,15 @@ LOGO_DICT = dict(
         [
             SRC_DIR + "logo_asf.png",
             SRC_DIR + "logo_clash.png",
+            SRC_DIR + "logo_drawio.png",
+            SRC_DIR + "logo_otp.png",
             SRC_DIR + "logo_ventoy.png",
             SRC_DIR + "logo_waifu.png",
             SRC_DIR + "php_elephant.png",
         ],
     )
 )
-APP_LIST = [asf, cfw, ventoy, waifu, xprober]
+APP_LIST = [asf, cfw, drawio, otp, ventoy, waifu, xprober]
 APP_DICT = dict(zip(ROW_LIST, APP_LIST))
 CONFIG_PATH = "./config.ini"
 
@@ -162,13 +168,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         row_index = 0  # 避免在循环内调用ROW_LIST.index(item)获取行号
         for item in ROW_LIST:
             self.tableWidget.insertRow(row_index)
-            self.tableWidget.setRowHeight(row_index, 80)
+            self.tableWidget.setRowHeight(row_index, 64)
             # name
             name = QTableWidgetItem(" " * 3 + NAME_DICT[item])
             self.tableWidget.setItem(row_index, COL_NAME, name)
             # logo
             label_logo = QLabelButton()
-            label_logo.setPixmap(QPixmap(LOGO_DICT[item]).scaledToWidth(64))
+            label_logo.setPixmap(QPixmap(LOGO_DICT[item]).scaledToWidth(40))
             label_logo.setAlignment(Qt.AlignCenter)
             self.tableWidget.setCellWidget(row_index, COL_LOGO, label_logo)
             label_logo.DoubleClicked.connect(

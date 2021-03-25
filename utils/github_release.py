@@ -108,14 +108,20 @@ class GitHubRelease:
             print(" | ", end="")
             print("%.2f MB" % (int(item["size"]) / 1024 / 1024))
 
-    def get_download_url_by(self, key, by="name"):
+    def get_download_url_by(self, value, key="name"):
         for item in self.release_assets:
-            if item[by] == key:
+            if item[key] == value:
                 return item["browser_download_url"]
         return ""
 
-    def get_download_url(self):
-        return self.get_download_url_by(self.release_file_name, "name")
+    def get_download_url(self, fuzzy=False):
+        if fuzzy:
+            for item in self.release_assets:
+                if item["name"].startswith(self.release_file_name):
+                    return item["browser_download_url"]
+            return ""
+        else:
+            return self.get_download_url_by(self.release_file_name, "name")
 
     def is_latest(self, info=False):
         if not self.local_version:

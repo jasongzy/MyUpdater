@@ -139,4 +139,5 @@ cython_debug/
 
 test.py
 *.bat
+.vscode/
 .idea/
