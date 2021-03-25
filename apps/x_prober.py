@@ -16,6 +16,7 @@ app = GitHubRelease(REPO)
 def get_prober_version():
     local_version = "0.0.0.0"
     global current_filename
+    current_filename = None
     for item in os.listdir(app.local_dir):
         if item.startswith("xprober_") and (not item.endswith(".old")):
             current_filename = item
@@ -37,7 +38,8 @@ def init(check_release=True):
         print('本地目录配置有误："' + app.local_dir + '" 不存在！')
         return
     app.local_version = get_prober_version()
-    app.exe_path = os.path.join(app.local_dir, current_filename)
+    if current_filename:
+        app.exe_path = os.path.join(app.local_dir, current_filename)
     include_pre = file_io.get_config(ID, "pre_release")
     if include_pre:
         try:
@@ -54,7 +56,9 @@ def init(check_release=True):
 
 
 def update(silent=False):
-    old_file = os.path.join(app.local_dir, current_filename)
+    old_exist = bool(current_filename)
+    if old_exist:
+        old_file = os.path.join(app.local_dir, current_filename)
     new_file = os.path.join(app.local_dir, "xprober_" + app.latest_version + ".php")
     if file_io.downloader(
         app.release_file_url,
@@ -63,11 +67,13 @@ def update(silent=False):
         silent,
     ):
         return -1
-    os.rename(old_file, old_file + ".old")
-    old_file += ".old"
+    if old_exist:
+        os.rename(old_file, old_file + ".old")
+        old_file += ".old"
     app.local_version = get_prober_version()
     if app.is_latest() == 1:
-        os.remove(old_file)
+        if old_exist:
+            os.remove(old_file)
         print("X Prober %s 更新成功！" % app.local_version)
         return 0
     else:
