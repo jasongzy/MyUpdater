@@ -1,3 +1,4 @@
+import os
 import sys
 
 from PyQt5.QtCore import (
@@ -83,6 +84,7 @@ LOGO_DICT = dict(
 APP_LIST = [asf, cfw, drawio, otp, ventoy, waifu, xprober]
 APP_DICT = dict(zip(ROW_LIST, APP_LIST))
 CONFIG_PATH = "./config.ini"
+PWD = os.getcwd()
 
 
 class MyThread(QThread):
@@ -178,8 +180,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             label_logo.setAlignment(Qt.AlignCenter)
             self.tableWidget.setCellWidget(row_index, COL_LOGO, label_logo)
             label_logo.DoubleClicked.connect(
-                lambda path=APP_DICT[item].app.exe_path: QDesktopServices.openUrl(
-                    QUrl.fromLocalFile(path)
+                lambda dir=APP_DICT[item].app.local_dir, exe=APP_DICT[
+                    item
+                ].app.exe_path: (
+                    os.chdir(dir),
+                    QDesktopServices.openUrl(QUrl.fromLocalFile(exe)),
+                    os.chdir(PWD),
                 )
             )
             # github_button
