@@ -180,10 +180,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             label_logo.setAlignment(Qt.AlignCenter)
             self.tableWidget.setCellWidget(row_index, COL_LOGO, label_logo)
             label_logo.DoubleClicked.connect(
-                lambda dir=APP_DICT[item].app.local_dir, exe=APP_DICT[
-                    item
-                ].app.exe_path: (
-                    os.chdir(dir),
+                lambda exe=APP_DICT[item].app.exe_path: (
+                    os.chdir(os.path.dirname(exe)),
                     QDesktopServices.openUrl(QUrl.fromLocalFile(exe)),
                     os.chdir(PWD),
                 )

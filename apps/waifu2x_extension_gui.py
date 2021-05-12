@@ -34,7 +34,9 @@ def init(check_release=True):
     if not os.path.isdir(app.local_dir):
         print('本地目录配置有误："' + app.local_dir + '" 不存在！')
         return
-    app.exe_path = os.path.join(app.local_dir, r"Waifu2x-Extension-GUI-Start.bat")
+    app.exe_path = os.path.join(
+        app.local_dir, r"waifu2x-extension-gui\Waifu2x-Extension-GUI-Launcher.exe"
+    )
     app.local_version = get_waifu_version()
     include_pre = file_io.get_config(ID, "pre_release")
     if include_pre:
@@ -72,7 +74,7 @@ def update(silent=False):
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
     # 打开程序以更新settings.ini
     pwd = os.getcwd()
-    os.chdir(app.local_dir)
+    os.chdir(os.path.join(app.local_dir, r"waifu2x-extension-gui"))
     os.popen(app.exe_path)
     os.chdir(pwd)
     sleep(15)
