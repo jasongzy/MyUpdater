@@ -155,7 +155,7 @@ class GitHubRelease:
                 else:
                     print("未找到指定的 Release 文件！")
             if not self.release_file_url:
-                return -1
+                return -2
             return 0
 
     def update_interact(self, update):
