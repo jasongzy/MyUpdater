@@ -70,15 +70,20 @@ SRC_DIR = "src/"
 LOGO_DICT = dict(
     zip(
         ROW_LIST,
-        [
-            SRC_DIR + "logo_asf.png",
-            SRC_DIR + "logo_clash.png",
-            SRC_DIR + "logo_drawio.png",
-            SRC_DIR + "logo_otp.png",
-            SRC_DIR + "logo_ventoy.png",
-            SRC_DIR + "logo_waifu.png",
-            SRC_DIR + "php_elephant.png",
-        ],
+        list(
+            map(
+                lambda x: SRC_DIR + x,
+                [
+                    "logo_asf.png",
+                    "logo_clash.png",
+                    "logo_drawio.png",
+                    "logo_otp.png",
+                    "logo_ventoy.png",
+                    "logo_waifu.png",
+                    "php_elephant.png",
+                ],
+            )
+        ),
     )
 )
 APP_LIST = [asf, cfw, drawio, otp, ventoy, waifu, xprober]
@@ -391,6 +396,14 @@ if __name__ == "__main__":
         QMessageBox.critical(None, "错误", "配置文件存在严重错误，\n请修正后再启动！")
         QDesktopServices.openUrl(QUrl.fromLocalFile(CONFIG_PATH))
         sys.exit()
+    for id in ROW_LIST:
+        enabled = file_io.get_config(id, "enabled", False)
+        if enabled == "0":
+            ROW_LIST.remove(id)
+            APP_LIST.remove(globals()[id])
+            NAME_DICT.pop(id)
+            LOGO_DICT.pop(id)
+            APP_DICT.pop(id)
     MainWindow = MyMainWindow()
     MainWindow.show()
     sys.exit(MainApp.exec_())

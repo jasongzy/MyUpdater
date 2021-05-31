@@ -86,11 +86,12 @@ def update_config(path):
     return 0
 
 
-def get_config(section, key):
+def get_config(section, key, info=True):
     if section in CONFIG:
         return CONFIG[section].get(key, "")
     else:
-        print("配置文件中 " + section + " 项不存在！")
+        if info:
+            print("配置文件中 " + section + " 项不存在！")
         return ""
 
 
