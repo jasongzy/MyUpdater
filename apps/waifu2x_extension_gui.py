@@ -59,9 +59,13 @@ def init(check_release=True):
         # app.release_file_url = app.get_download_url()
         # 采用提供的超星云盘直链
         if app.release_body:
-            app.release_file_url = re.findall(
+            chaoxing_url = re.findall(
                 r"http://d0.ananas.chaoxing.com[^\s]*7z", app.release_body
-            )[0]
+            )
+            if len(chaoxing_url) > 0:
+                app.release_file_url = chaoxing_url[0]
+            else:
+                app.release_file_url = ""
 
 
 def update(silent=False):
