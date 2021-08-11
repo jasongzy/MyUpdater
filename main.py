@@ -66,13 +66,13 @@ NAME_DICT = dict(
         ],
     )
 )
-SRC_DIR = "src/"
+RES_DIR = "res/"
 LOGO_DICT = dict(
     zip(
         ROW_LIST,
         list(
             map(
-                lambda x: SRC_DIR + x,
+                lambda x: RES_DIR + x,
                 [
                     "logo_asf.png",
                     "logo_clash.png",
@@ -193,7 +193,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             )
             # github_button
             label_github = QLabelButton()
-            label_github.setPixmap(QPixmap(SRC_DIR + "github.svg").scaledToWidth(35))
+            label_github.setPixmap(QPixmap(RES_DIR + "github.svg").scaledToWidth(35))
             label_github.setCursor(QCursor(Qt.PointingHandCursor))
             label_github.setAlignment(Qt.AlignCenter)
             label_github.setToolTip(APP_DICT[item].app.repo_url)
@@ -206,7 +206,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             )
             # path_button
             label_dir = QLabelButton()
-            label_dir.setPixmap(QPixmap(SRC_DIR + "folder.svg").scaledToWidth(35))
+            label_dir.setPixmap(QPixmap(RES_DIR + "folder.svg").scaledToWidth(35))
             label_dir.setCursor(QCursor(Qt.PointingHandCursor))
             label_dir.setAlignment(Qt.AlignCenter)
             self.tableWidget.setCellWidget(row_index, COL_PATH_BUTTON, label_dir)
@@ -217,7 +217,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             )
             # update_button
             label_update = self.update_button_dict[item]
-            label_update.setPixmap(QPixmap(SRC_DIR + "update.svg").scaledToWidth(35))
+            label_update.setPixmap(QPixmap(RES_DIR + "update.svg").scaledToWidth(35))
             label_update.setCursor(QCursor(Qt.PointingHandCursor))
             label_update.setAlignment(Qt.AlignCenter)
             label_update.setEnabled(False)
@@ -255,7 +255,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # 刷新按钮
         self.refreshButton.clicked.connect(self.onButtonClicked)
-        # self.refreshButton.setIcon(QIcon(SRC_DIR + "refresh.svg"))
+        # self.refreshButton.setIcon(QIcon(RES_DIR + "refresh.svg"))
         # self.refreshButton.setIconSize(QSize(60, 60))
         self.checked_list = []  # 记录检查完毕的item
         self.counter_num = 0
@@ -322,20 +322,20 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.setItem(row_index, COL_LATEST_VERSION, latest_version)
         is_latest = app.is_latest()
         if is_latest == 1:
-            latest_version.setIcon(QIcon(SRC_DIR + "equal.svg"))
+            latest_version.setIcon(QIcon(RES_DIR + "equal.svg"))
             self.update_button_dict[item].setEnabled(False)
         elif is_latest == 0:
-            latest_version.setIcon(QIcon(SRC_DIR + "right.svg"))
+            latest_version.setIcon(QIcon(RES_DIR + "right.svg"))
             self.update_button_dict[item].setEnabled(True)
             self.counter_num += 1
             # self.set_row_background_color(row_index, 197, 237, 226)
         elif is_latest == -1:
             local_version.setText("未知")
-            latest_version.setIcon(QIcon(SRC_DIR + "right.svg"))
+            latest_version.setIcon(QIcon(RES_DIR + "right.svg"))
             self.update_button_dict[item].setEnabled(True)
             self.counter_num += 1
         else:
-            latest_version.setIcon(QIcon(SRC_DIR + "error.svg"))
+            latest_version.setIcon(QIcon(RES_DIR + "error.svg"))
             self.update_button_dict[item].setEnabled(False)
             # self.set_row_background_color(row_index, 250, 214, 214)
             print("%s：无法找到最新版本下载地址！" % NAME_DICT[item])

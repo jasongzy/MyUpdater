@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>src/juice.png</normaloff>src/juice.png</iconset>
+    <normaloff>res/juice.png</normaloff>res/juice.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -102,7 +102,7 @@ QPushButton::pressed{
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>src/refresh.svg</normaloff>src/refresh.svg</iconset>
+          <normaloff>res/refresh.svg</normaloff>res/refresh.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
