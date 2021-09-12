@@ -167,6 +167,12 @@ def downloader(url, file_path, proxy_dict={}, silent=False):
                 print("目标文件已存在，是否覆盖？(Y/N) ", end="")
                 input_confirm = input().upper()
                 if input_confirm == "N":
+                    print("是否直接使用已存在的文件？(Y/N) ", end="")
+                    input_confirm2 = input().upper()
+                    if input_confirm2 == "N":
+                        return -1
+                    elif input_confirm2 == "Y":
+                        return 0
                     return -1
                 elif input_confirm == "Y":
                     break
