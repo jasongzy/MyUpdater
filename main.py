@@ -37,6 +37,8 @@ import apps.clash_for_windows as cfw
 import apps.drawio_desktop as drawio
 import apps.mimikatz as mimikatz
 import apps.office_tool_plus as otp
+import apps.qtscrcpy as qtscrcpy
+import apps.scrcpy as scrcpy
 import apps.ventoy as ventoy
 import apps.waifu2x_extension_gui as waifu
 import apps.x_prober as xprober
@@ -52,7 +54,18 @@ COL_GITHUB_BUTTON = 5
 COL_PATH_BUTTON = 6
 COL_UPDATE_BUTTON = 7
 
-ROW_LIST = ["asf", "cfw", "drawio", "mimikatz", "otp", "ventoy", "waifu", "xprober"]
+ROW_LIST = [
+    "asf",
+    "cfw",
+    "drawio",
+    "mimikatz",
+    "otp",
+    "qtscrcpy",
+    "scrcpy",
+    "ventoy",
+    "waifu",
+    "xprober",
+]
 NAME_DICT = dict(
     zip(
         ROW_LIST,
@@ -62,6 +75,8 @@ NAME_DICT = dict(
             "draw.io Desktop",
             "mimikatz",
             "Office Tool Plus",
+            "QtScrcpy",
+            "scrcpy",
             "Ventoy",
             "Waifu2x Extension GUI",
             "X Prober",
@@ -81,6 +96,8 @@ LOGO_DICT = dict(
                     "logo_drawio.png",
                     "logo_mimikatz.png",
                     "logo_otp.png",
+                    "logo_qtscrcpy.png",
+                    "logo_scrcpy.png",
                     "logo_ventoy.png",
                     "logo_waifu.png",
                     "php_elephant.png",
@@ -89,7 +106,7 @@ LOGO_DICT = dict(
         ),
     )
 )
-APP_LIST = [asf, cfw, drawio, mimikatz, otp, ventoy, waifu, xprober]
+APP_LIST = [asf, cfw, drawio, mimikatz, otp, qtscrcpy, scrcpy, ventoy, waifu, xprober]
 APP_DICT = dict(zip(ROW_LIST, APP_LIST))
 CONFIG_PATH = "./config.ini"
 PWD = os.getcwd()
