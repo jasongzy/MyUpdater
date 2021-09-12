@@ -67,7 +67,7 @@ class GitHubRelease:
     release_body = ""
     release_file_url = ""
 
-    def __init__(self, repo):
+    def __init__(self, repo: str):
         self.repo = repo
         self.repo_url = "https://github.com/" + repo
 

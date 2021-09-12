@@ -12,6 +12,7 @@ from utils.github_release import GitHubRelease
 ID = "asf"
 REPO = "JustArchiNET/ArchiSteamFarm"
 TMP_DIR = os.environ.get("TEMP")
+FILENAME = "ArchiSteamFarm.exe"
 
 app = GitHubRelease(REPO)
 
@@ -35,7 +36,7 @@ def init(check_release=True):
     if not os.path.isdir(app.local_dir):
         print('本地目录配置有误："' + app.local_dir + '" 不存在！')
         return
-    app.exe_path = os.path.join(app.local_dir, "ArchiSteamFarm.exe")
+    app.exe_path = os.path.join(app.local_dir, FILENAME)
     # app.local_version = get_asf_version()
     app.local_version = file_io.get_exe_version(app.exe_path)
     include_pre = file_io.get_config(ID, "pre_release")

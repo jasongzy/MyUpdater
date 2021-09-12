@@ -10,6 +10,7 @@ from utils.github_release import GitHubRelease
 ID = "ventoy"
 REPO = "ventoy/Ventoy"
 TMP_DIR = os.environ.get("TEMP")
+FILENAME = "Ventoy2Disk.exe"
 WHITE_LIST = [
     "manual_for_ventoy_with_secure_boot.png",
     "secure_cn.png",
@@ -35,7 +36,7 @@ def init(check_release=True):
     if not os.path.isdir(app.local_dir):
         print('本地目录配置有误："' + app.local_dir + '" 不存在！')
         return
-    app.exe_path = os.path.join(app.local_dir, "Ventoy2Disk.exe")
+    app.exe_path = os.path.join(app.local_dir, FILENAME)
     app.local_version = get_ventoy_version()
     include_pre = file_io.get_config(ID, "pre_release")
     if include_pre:

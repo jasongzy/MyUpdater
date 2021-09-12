@@ -10,6 +10,7 @@ from utils.github_release import GitHubRelease
 ID = "mimikatz"
 REPO = "gentilkiwi/mimikatz"
 TMP_DIR = os.environ.get("TEMP")
+FILENAME = "x64\mimikatz.exe"
 WHITE_LIST = [
     "version",
     "WDigest.reg",
@@ -47,7 +48,7 @@ def init(check_release=True):
     if not os.path.isdir(app.local_dir):
         print('本地目录配置有误："' + app.local_dir + '" 不存在！')
         return
-    app.exe_path = os.path.join(app.local_dir, "x64\mimikatz.exe")
+    app.exe_path = os.path.join(app.local_dir, FILENAME)
     app.local_version = get_mimikatz_version()
     include_pre = file_io.get_config(ID, "pre_release")
     if include_pre:

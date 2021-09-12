@@ -10,6 +10,7 @@ from utils.github_release import GitHubRelease
 ID = "cfw"
 REPO = "Fndroid/clash_for_windows_pkg"
 TMP_DIR = os.environ.get("TEMP")
+FILENAME = "Clash for Windows.exe"
 
 app = GitHubRelease(REPO)
 
@@ -19,7 +20,7 @@ def init(check_release=True):
     if not os.path.isdir(app.local_dir):
         print('本地目录配置有误："' + app.local_dir + '" 不存在！')
         return
-    app.exe_path = os.path.join(app.local_dir, "Clash for Windows.exe")
+    app.exe_path = os.path.join(app.local_dir, FILENAME)
     app.local_version = file_io.get_exe_version(app.exe_path)
     include_pre = file_io.get_config(ID, "pre_release")
     if include_pre:
@@ -51,7 +52,7 @@ def update(silent=False):
         silent,
     ):
         return -1
-    file_io.terminate_process("Clash for Windows.exe", not silent)
+    file_io.terminate_process(FILENAME, not silent)
     file_io.empty_dir_interact(app.local_dir, True, [], not silent)
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
     app.local_version = file_io.get_exe_version(app.exe_path)
