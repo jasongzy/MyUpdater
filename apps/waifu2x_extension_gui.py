@@ -71,13 +71,6 @@ def update(silent=False):
         return -1
     # file_io.empty_dir_interact(app.local_dir, True, [], not silent)
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
-    # 编辑启动脚本，清空QT_PLUGIN_PATH环境变量
-    # 否则pyinstaller打包后运行时，启动waifu2x将报错
-    with open(app.exe_path, "r+", encoding="utf-8") as f:
-        content = f.read()
-        f.seek(0, 0)
-        text = "@echo off\nset QT_PLUGIN_PATH="
-        f.write(text + "\n" + content)
     # 打开程序以更新settings.ini
     pwd = os.getcwd()
     os.chdir(os.path.join(app.local_dir))

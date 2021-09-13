@@ -412,6 +412,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
 if __name__ == "__main__":
     MainApp = QApplication(sys.argv)
+    # 清空QT_PLUGIN_PATH环境变量
+    # 否则用pyinstaller打包后运行时，启动其他Qt打包的程序将报错
+    if os.environ.get("QT_PLUGIN_PATH"):
+        del os.environ["QT_PLUGIN_PATH"]
     if file_io.update_config(CONFIG_PATH):
         QMessageBox.critical(None, "错误", "配置文件存在严重错误，\n请修正后再启动！")
         QDesktopServices.openUrl(QUrl.fromLocalFile(CONFIG_PATH))
