@@ -118,6 +118,7 @@ class GitHubRelease:
         if fuzzy:
             for item in self.release_assets:
                 if item["name"].startswith(self.release_file_name):
+                    self.release_file_name = item["name"]
                     return item["browser_download_url"]
             return ""
         else:

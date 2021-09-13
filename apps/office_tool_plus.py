@@ -51,7 +51,10 @@ def update(silent=False):
         silent,
     ):
         return -1
-    file_io.empty_dir_interact(app.local_dir, True, [], not silent)
+    whitelist = file_io.get_config(ID, "whitelist").split(",")
+    whitelist = list(map(str.strip, whitelist))
+    whitelist = list(filter(None, whitelist))
+    file_io.empty_dir_interact(app.local_dir, True, whitelist, not silent)
     file_io.unpack_zip(tmp_file, app.local_dir)
     file_io.cut_dir(
         os.path.join(app.local_dir, "Office Tool"), app.local_dir,

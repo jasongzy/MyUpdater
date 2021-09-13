@@ -53,7 +53,10 @@ def update(silent=False):
     ):
         return -1
     file_io.terminate_process(FILENAME, not silent)
-    file_io.empty_dir_interact(app.local_dir, True, [], not silent)
+    whitelist = file_io.get_config(ID, "whitelist").split(",")
+    whitelist = list(map(str.strip, whitelist))
+    whitelist = list(filter(None, whitelist))
+    file_io.empty_dir_interact(app.local_dir, True, whitelist, not silent)
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:

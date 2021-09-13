@@ -11,11 +11,6 @@ ID = "mimikatz"
 REPO = "gentilkiwi/mimikatz"
 TMP_DIR = os.environ.get("TEMP")
 FILENAME = "x64\mimikatz.exe"
-WHITE_LIST = [
-    "version",
-    "WDigest.reg",
-    "使用方法.txt",
-]
 
 app = GitHubRelease(REPO)
 
@@ -76,7 +71,10 @@ def update(silent=False):
         silent,
     ):
         return -1
-    file_io.empty_dir_interact(app.local_dir, True, WHITE_LIST, not silent)
+    whitelist = file_io.get_config(ID, "whitelist").split(",")
+    whitelist = list(map(str.strip, whitelist))
+    whitelist = list(filter(None, whitelist))
+    file_io.empty_dir_interact(app.local_dir, True, whitelist, not silent)
     file_io.unpack_zip(tmp_file, app.local_dir)
     write_mimikatz_version(app.latest_version)
     app.local_version = get_mimikatz_version()

@@ -11,10 +11,6 @@ ID = "scrcpy"
 REPO = "Genymobile/scrcpy"
 TMP_DIR = os.environ.get("TEMP")
 FILENAME = "scrcpy.exe"
-WHITE_LIST = [
-    "远程控制连接手机.bat",
-    "远程控制连接手机_frp.bat",
-]
 
 app = GitHubRelease(REPO)
 
@@ -70,7 +66,10 @@ def update(silent=False):
         silent,
     ):
         return -1
-    file_io.empty_dir_interact(app.local_dir, True, WHITE_LIST, not silent)
+    whitelist = file_io.get_config(ID, "whitelist").split(",")
+    whitelist = list(map(str.strip, whitelist))
+    whitelist = list(filter(None, whitelist))
+    file_io.empty_dir_interact(app.local_dir, True, whitelist, not silent)
     file_io.unpack_zip(tmp_file, app.local_dir)
     app.local_version = get_scrcpy_version()
     if app.is_latest() == 1:
