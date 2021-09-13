@@ -13,6 +13,7 @@ from utils.github_release import GitHubRelease
 ID = "waifu"
 REPO = "AaronFeng753/Waifu2x-Extension-GUI"
 TMP_DIR = os.environ.get("TEMP")
+FILENAME = "Waifu2x-Extension-GUI-Start.bat"
 
 app = GitHubRelease(REPO)
 
@@ -34,9 +35,7 @@ def init(check_release=True):
     if not os.path.isdir(app.local_dir):
         print('本地目录配置有误："' + app.local_dir + '" 不存在！')
         return
-    app.exe_path = os.path.join(
-        app.local_dir, r"waifu2x-extension-gui\Waifu2x-Extension-GUI-Launcher.exe"
-    )
+    app.exe_path = os.path.join(app.local_dir, FILENAME)
     app.local_version = get_waifu_version()
     include_pre = file_io.get_config(ID, "pre_release")
     if include_pre:
@@ -53,36 +52,39 @@ def init(check_release=True):
         )
         # Release 文件名包含版本号
         # 在配置文件中用$代替
-        app.release_file_name = file_io.get_config(ID, "release_file").replace(
-            "$", app.latest_version
-        )
-        # app.release_file_url = app.get_download_url()
-        # 采用提供的超星云盘直链
-        if app.release_body:
-            chaoxing_url = re.findall(
-                r"http://d0.ananas.chaoxing.com[^\s]*7z", app.release_body
-            )
-            if len(chaoxing_url) > 0:
-                app.release_file_url = chaoxing_url[0]
-            else:
-                app.release_file_url = ""
+        #! 支持增量更新：模糊查找
+        app.release_file_name = file_io.get_config(ID, "release_file").split("$", 1)[0]
+        app.release_file_url = app.get_download_url(True)
 
 
 def update(silent=False):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
-    if file_io.downloader_idm(
-        file_io.get_config("common", "idm_path"), app.release_file_url, tmp_file
+    # if file_io.downloader_idm(
+    #     file_io.get_config("common", "idm_path"), app.release_file_url, tmp_file
+    # ):
+    if file_io.downloader(
+        app.release_file_url,
+        tmp_file,
+        file_io.get_config("common", "proxy_dict"),
+        silent,
     ):
         return -1
-    file_io.empty_dir_interact(app.local_dir, True, [], not silent)
+    # file_io.empty_dir_interact(app.local_dir, True, [], not silent)
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
+    # 编辑启动脚本，清空QT_PLUGIN_PATH环境变量
+    # 否则pyinstaller打包后运行时，启动waifu2x将报错
+    with open(app.exe_path, "r+", encoding="utf-8") as f:
+        content = f.read()
+        f.seek(0, 0)
+        text = "@echo off\nset QT_PLUGIN_PATH="
+        f.write(text + "\n" + content)
     # 打开程序以更新settings.ini
     pwd = os.getcwd()
-    os.chdir(os.path.join(app.local_dir, r"waifu2x-extension-gui"))
+    os.chdir(os.path.join(app.local_dir))
     os.popen(app.exe_path)
     os.chdir(pwd)
     sleep(15)
-    file_io.terminate_process("Waifu2x-Extension-GUI.exe")
+    # file_io.terminate_process("Waifu2x-Extension-GUI.exe")
     app.local_version = get_waifu_version()
     if app.is_latest() == 1:
         os.remove(tmp_file)
