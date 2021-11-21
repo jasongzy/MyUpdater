@@ -125,12 +125,7 @@ def get_exe_version(path):
 
     ms = info["FileVersionMS"]
     ls = info["FileVersionLS"]
-    version = "%d.%d.%d.%d" % (
-        win32api.HIWORD(ms),
-        win32api.LOWORD(ms),
-        win32api.HIWORD(ls),
-        win32api.LOWORD(ls),
-    )
+    version = "%d.%d.%d.%d" % (win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls),)
     return version
 
 
@@ -210,11 +205,7 @@ def downloader(url, file_path, proxy_dict={}, silent=False):
                     if not silent:
                         print(
                             "\r"
-                            + "[下载进度]: %s%.2f%%"
-                            % (
-                                ">" * int(size * 50 / file_size),
-                                float(size / file_size * 100),
-                            ),
+                            + "[下载进度]: %s%.2f%%" % (">" * int(size * 50 / file_size), float(size / file_size * 100),),
                             end="",
                         )
                     else:  # 避免过于频繁的print
@@ -224,10 +215,7 @@ def downloader(url, file_path, proxy_dict={}, silent=False):
                         if "percent_10x_last" not in dir():  # 未定义变量（第一次循环）
                             percent_10x_last = -1
                         if percent_10x % 100 == 0 and percent_10x != percent_10x_last:
-                            print(
-                                "[下载进度]: %s%.2f%%"
-                                % (">" * int(size * 50 / file_size), percent)
-                            )
+                            print("[下载进度]: %s%.2f%%" % (">" * int(size * 50 / file_size), percent))
                             percent_10x_last = percent_10x
 
         end_time = time.time()

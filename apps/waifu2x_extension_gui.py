@@ -21,9 +21,7 @@ app = GitHubRelease(REPO)
 def get_waifu_version():
     local_version = "0.0.0.0"
     try:
-        waifu_config = file_io.read_config(
-            os.path.join(app.local_dir, r"waifu2x-extension-gui\settings.ini")
-        )
+        waifu_config = file_io.read_config(os.path.join(app.local_dir, r"waifu2x-extension-gui\settings.ini"))
         local_version = waifu_config["settings"]["VERSION"]
     except:
         print("未找到 Waifu2x Extension GUI 当前版本！")
@@ -46,9 +44,7 @@ def init(check_release=True):
             include_pre = 0
     if check_release:
         app.check_release(
-            include_pre,
-            file_io.get_config("common", "proxy_dict"),
-            file_io.get_config("common", "github_oauth"),
+            include_pre, file_io.get_config("common", "proxy_dict"), file_io.get_config("common", "github_oauth"),
         )
         # Release 文件名包含版本号
         # 在配置文件中用$代替
@@ -62,12 +58,7 @@ def update(silent=False):
     # if file_io.downloader_idm(
     #     file_io.get_config("common", "idm_path"), app.release_file_url, tmp_file
     # ):
-    if file_io.downloader(
-        app.release_file_url,
-        tmp_file,
-        file_io.get_config("common", "proxy_dict"),
-        silent,
-    ):
+    if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), silent,):
         return -1
     # file_io.empty_dir_interact(app.local_dir, True, [], not silent)
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)

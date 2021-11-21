@@ -31,26 +31,17 @@ def init(check_release=True):
             include_pre = 0
     if check_release:
         app.check_release(
-            include_pre,
-            file_io.get_config("common", "proxy_dict"),
-            file_io.get_config("common", "github_oauth"),
+            include_pre, file_io.get_config("common", "proxy_dict"), file_io.get_config("common", "github_oauth"),
         )
         # Release 文件名包含版本号
         # 在配置文件中用$代替
-        app.release_file_name = file_io.get_config(ID, "release_file").replace(
-            "$", app.latest_version
-        )
+        app.release_file_name = file_io.get_config(ID, "release_file").replace("$", app.latest_version)
         app.release_file_url = app.get_download_url()
 
 
 def update(silent=False):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
-    if file_io.downloader(
-        app.release_file_url,
-        tmp_file,
-        file_io.get_config("common", "proxy_dict"),
-        silent,
-    ):
+    if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), silent,):
         return -1
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))
@@ -58,8 +49,7 @@ def update(silent=False):
     file_io.empty_dir_interact(app.local_dir, True, whitelist, not silent)
     file_io.unpack_zip(tmp_file, app.local_dir)
     file_io.cut_dir(
-        os.path.join(app.local_dir, os.path.splitext(app.release_file_name)[0]),
-        app.local_dir,
+        os.path.join(app.local_dir, os.path.splitext(app.release_file_name)[0]), app.local_dir,
     )
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:

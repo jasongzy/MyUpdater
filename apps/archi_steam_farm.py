@@ -48,20 +48,13 @@ def init(check_release=True):
             include_pre = 0
     if check_release:
         app.check_release(
-            include_pre,
-            file_io.get_config("common", "proxy_dict"),
-            file_io.get_config("common", "github_oauth"),
+            include_pre, file_io.get_config("common", "proxy_dict"), file_io.get_config("common", "github_oauth"),
         )
 
 
 def update(silent=False):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
-    if file_io.downloader(
-        app.release_file_url,
-        tmp_file,
-        file_io.get_config("common", "proxy_dict"),
-        silent,
-    ):
+    if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), silent,):
         return -1
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))

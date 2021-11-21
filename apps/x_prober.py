@@ -49,9 +49,7 @@ def init(check_release=True):
             include_pre = 0
     if check_release:
         app.check_release(
-            include_pre,
-            file_io.get_config("common", "proxy_dict"),
-            file_io.get_config("common", "github_oauth"),
+            include_pre, file_io.get_config("common", "proxy_dict"), file_io.get_config("common", "github_oauth"),
         )
 
 
@@ -60,12 +58,7 @@ def update(silent=False):
     if old_exist:
         old_file = os.path.join(app.local_dir, current_filename)
     new_file = os.path.join(app.local_dir, "xprober_" + app.latest_version + ".php")
-    if file_io.downloader(
-        app.release_file_url,
-        new_file,
-        file_io.get_config("common", "proxy_dict"),
-        silent,
-    ):
+    if file_io.downloader(app.release_file_url, new_file, file_io.get_config("common", "proxy_dict"), silent,):
         return -1
     if old_exist:
         os.rename(old_file, old_file + ".old")

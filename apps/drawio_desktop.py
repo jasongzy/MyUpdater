@@ -30,15 +30,11 @@ def init(check_release=True):
             include_pre = 0
     if check_release:
         app.check_release(
-            include_pre,
-            file_io.get_config("common", "proxy_dict"),
-            file_io.get_config("common", "github_oauth"),
+            include_pre, file_io.get_config("common", "proxy_dict"), file_io.get_config("common", "github_oauth"),
         )
         # Release 文件名包含版本号
         # 在配置文件中用$代替
-        app.release_file_name = file_io.get_config(ID, "release_file").replace(
-            "$", str(app.latest_version[1:])
-        )
+        app.release_file_name = file_io.get_config(ID, "release_file").replace("$", str(app.latest_version[1:]))
         app.release_file_url = app.get_download_url()
 
 
@@ -50,9 +46,7 @@ def update(silent=False):
         old_exist = False
     if old_exist:
         os.rename(file, file + ".old")
-    if file_io.downloader(
-        app.release_file_url, file, file_io.get_config("common", "proxy_dict"), silent,
-    ):
+    if file_io.downloader(app.release_file_url, file, file_io.get_config("common", "proxy_dict"), silent,):
         return -1
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:

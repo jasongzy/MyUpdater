@@ -13,15 +13,7 @@ from PyQt5.QtCore import (
     QUrl,
     pyqtSignal,
 )
-from PyQt5.QtGui import (
-    QCursor,
-    QDesktopServices,
-    QFont,
-    QIcon,
-    QPalette,
-    QPixmap,
-    QTextCursor,
-)
+from PyQt5.QtGui import QCursor, QDesktopServices, QFont, QIcon, QPalette, QPixmap, QTextCursor
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -223,11 +215,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             label_github.setToolTip(APP_DICT[item].app.repo_url)
             self.tableWidget.setCellWidget(row_index, COL_GITHUB_BUTTON, label_github)
             # 为lambda添加默认参数以解决惰性求值问题
-            label_github.clicked.connect(
-                lambda url=APP_DICT[item].app.repo_url: QDesktopServices.openUrl(
-                    QUrl(url)
-                )
-            )
+            label_github.clicked.connect(lambda url=APP_DICT[item].app.repo_url: QDesktopServices.openUrl(QUrl(url)))
             # path_button
             label_dir = QLabelButton()
             label_dir.setPixmap(QPixmap(RES_DIR + "folder.svg").scaledToWidth(35))
@@ -235,9 +223,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             label_dir.setAlignment(Qt.AlignCenter)
             self.tableWidget.setCellWidget(row_index, COL_PATH_BUTTON, label_dir)
             label_dir.clicked.connect(
-                lambda path=APP_DICT[item].app.local_dir: QDesktopServices.openUrl(
-                    QUrl.fromLocalFile(path)
-                )
+                lambda path=APP_DICT[item].app.local_dir: QDesktopServices.openUrl(QUrl.fromLocalFile(path))
             )
             # update_button
             label_update = self.update_button_dict[item]
@@ -246,9 +232,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             label_update.setAlignment(Qt.AlignCenter)
             label_update.setEnabled(False)
             self.tableWidget.setCellWidget(row_index, COL_UPDATE_BUTTON, label_update)
-            label_update.clicked.connect(
-                lambda item=item: self.thread_update_dict[item].start()
-            )
+            label_update.clicked.connect(lambda item=item: self.thread_update_dict[item].start())
             # 描述
             desc = QTableWidgetItem(APP_DICT[item].app.repo)
             desc_font = QFont()
@@ -260,21 +244,15 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             row_index += 1
 
         # 手动调整列宽
-        self.tableWidget.horizontalHeader().setSectionResizeMode(
-            COL_LOGO, QHeaderView.Interactive
-        )
+        self.tableWidget.horizontalHeader().setSectionResizeMode(COL_LOGO, QHeaderView.Interactive)
         self.tableWidget.setColumnWidth(COL_LOGO, 80)
         # name、desc列自适应
         # 版本和按钮列固定宽度
         for col_index in range(COL_LOCAL_VERSION, COL_LATEST_VERSION + 1):
-            self.tableWidget.horizontalHeader().setSectionResizeMode(
-                col_index, QHeaderView.Interactive
-            )
+            self.tableWidget.horizontalHeader().setSectionResizeMode(col_index, QHeaderView.Interactive)
             self.tableWidget.setColumnWidth(col_index, 100)
         for col_index in range(COL_GITHUB_BUTTON, COL_UPDATE_BUTTON + 1):
-            self.tableWidget.horizontalHeader().setSectionResizeMode(
-                col_index, QHeaderView.Interactive
-            )
+            self.tableWidget.horizontalHeader().setSectionResizeMode(col_index, QHeaderView.Interactive)
             self.tableWidget.setColumnWidth(col_index, 50)
 
         # 刷新按钮
@@ -312,9 +290,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def print_UI(self, info: str):
         self.terminalText.moveCursor(QTextCursor.End)
         self.terminalText.insertPlainText(info)
-        QCoreApplication.processEvents(
-            QEventLoop.ExcludeUserInputEvents | QEventLoop.ExcludeSocketNotifiers
-        )
+        QCoreApplication.processEvents(QEventLoop.ExcludeUserInputEvents | QEventLoop.ExcludeSocketNotifiers)
 
     def thread_start_all(self):
         for item in ROW_LIST:
@@ -365,8 +341,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             print("%s：无法找到最新版本下载地址！" % NAME_DICT[item])
 
         self.counter.setText(
-            '<html><head/><body><p><span style=" color:#fe4365;">%d</span></p></body></html>'
-            % self.counter_num
+            '<html><head/><body><p><span style=" color:#fe4365;">%d</span></p></body></html>' % self.counter_num
         )
         self.checked_list.append(item)
         if info:
@@ -388,11 +363,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def config_changed(self):
         self.config_watcher.removePath(CONFIG_PATH)
         choice = QMessageBox.information(
-            self,
-            "配置文件已修改",
-            "新配置将在软件重启后生效\n是否重新启动？",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.Yes,
+            self, "配置文件已修改", "新配置将在软件重启后生效\n是否重新启动？", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes,
         )
         if choice == QMessageBox.Yes:
             MainApp.quit()

@@ -32,9 +32,7 @@ def oauth_test(oauth_token, proxy_dict={}):
     api = GITHUB_API + "/rate_limit"
     headers = {"Authorization": "token " + oauth_token}
     try:
-        response = requests.get(
-            api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10,
-        )
+        response = requests.get(api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10,)
     except requests.exceptions.ReadTimeout:
         print("Request timeout")
         return -1
@@ -77,13 +75,7 @@ class GitHubRelease:
         if not include_pre:
             api += "/latest"
         try:
-            response = requests.get(
-                api,
-                headers=headers,
-                allow_redirects=False,
-                proxies=proxy_dict,
-                timeout=10,
-            )
+            response = requests.get(api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10,)
         except requests.exceptions.ReadTimeout:
             print("Request timeout")
             return

@@ -31,26 +31,17 @@ def init(check_release=True):
             include_pre = 0
     if check_release:
         app.check_release(
-            include_pre,
-            file_io.get_config("common", "proxy_dict"),
-            file_io.get_config("common", "github_oauth"),
+            include_pre, file_io.get_config("common", "proxy_dict"), file_io.get_config("common", "github_oauth"),
         )
         # Release 文件名包含版本号
         # 在配置文件中用$代替
-        app.release_file_name = file_io.get_config(ID, "release_file").replace(
-            "$", app.latest_version
-        )
+        app.release_file_name = file_io.get_config(ID, "release_file").replace("$", app.latest_version)
         app.release_file_url = app.get_download_url()
 
 
 def update(silent=False):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
-    if file_io.downloader(
-        app.release_file_url,
-        tmp_file,
-        file_io.get_config("common", "proxy_dict"),
-        silent,
-    ):
+    if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), silent,):
         return -1
     file_io.terminate_process(FILENAME, not silent)
     whitelist = file_io.get_config(ID, "whitelist").split(",")
