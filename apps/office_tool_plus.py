@@ -48,7 +48,10 @@ def update(silent=False):
     whitelist = list(map(str.strip, whitelist))
     whitelist = list(filter(None, whitelist))
     file_io.empty_dir_interact(app.local_dir, True, whitelist, not silent)
-    file_io.unpack_zip(tmp_file, app.local_dir)
+    if os.path.splitext(app.release_file_name)[1] == ".7z":
+        file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
+    else:
+        file_io.unpack_zip(tmp_file, app.local_dir)
     file_io.cut_dir(
         os.path.join(app.local_dir, "Office Tool"), app.local_dir,
     )
