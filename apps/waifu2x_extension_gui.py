@@ -50,17 +50,17 @@ def init(check_release=True):
         # 在配置文件中用$代替
         #! 支持增量更新：模糊查找
         app.release_file_name = file_io.get_config(ID, "release_file").split("$", 1)[0]
-        app.release_file_url = app.get_download_url(True)
+        app.release_file_url = app.get_download_url(fuzzy=True)
 
 
-def update(silent=False):
+def update(verbose=True):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
     # if file_io.downloader_idm(
     #     file_io.get_config("common", "idm_path"), app.release_file_url, tmp_file
     # ):
-    if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), silent,):
+    if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
-    # file_io.empty_dir_interact(app.local_dir, True, [], not silent)
+    # file_io.empty_dir_interact(app.local_dir, True, [], verbose=verbose)
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
     # 打开程序以更新settings.ini
     pwd = os.getcwd()

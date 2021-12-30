@@ -86,19 +86,19 @@ def update_config(path):
     return 0
 
 
-def get_config(section, key, info=True):
+def get_config(section, key, verbose=True):
     if section in CONFIG:
         return CONFIG[section].get(key, "")
     else:
-        if info:
+        if verbose:
             print("配置文件中 " + section + " 项不存在！")
         return ""
 
 
-def terminate_process(name, confirm=False):
+def terminate_process(name, verbose=False):
     tasklist = "".join(os.popen('tasklist /FI "IMAGENAME eq %s"' % name).readlines())
     if "PID" in tasklist:  # 进程存在
-        if confirm:
+        if verbose:
             while True:
                 print("%s 正在运行，是否结束进程？(Y/N) " % name, end="")
                 choice = input().upper()
@@ -125,7 +125,7 @@ def get_exe_version(path):
 
     ms = info["FileVersionMS"]
     ls = info["FileVersionLS"]
-    version = "%d.%d.%d.%d" % (win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls),)
+    version = "%d.%d.%d.%d" % (win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls))
     return version
 
 
@@ -147,7 +147,7 @@ def cut_dir(src_dir, dest_dir, remove_old_dir=True):
     return 0
 
 
-def downloader(url, file_path, proxy_dict={}, silent=False):
+def downloader(url, file_path, proxy_dict={}, verbose=True):
     # 路径合法性检测
     dest_dir = os.path.dirname(file_path)
     if not os.path.exists(dest_dir):
@@ -156,7 +156,7 @@ def downloader(url, file_path, proxy_dict={}, silent=False):
     if os.path.isdir(file_path):
         print("目标路径错误！请输入文件路径，而非目录")
         return -1
-    if not silent:
+    if verbose:
         if os.path.isfile(file_path):
             while True:
                 print("目标文件已存在，是否覆盖？(Y/N) ", end="")
@@ -202,10 +202,10 @@ def downloader(url, file_path, proxy_dict={}, silent=False):
                     f.write(data)
                     size += len(data)
                     # 进度条
-                    if not silent:
+                    if verbose:
                         print(
                             "\r"
-                            + "[下载进度]: %s%.2f%%" % (">" * int(size * 50 / file_size), float(size / file_size * 100),),
+                            + "[下载进度]: %s%.2f%%" % (">" * int(size * 50 / file_size), float(size / file_size * 100)),
                             end="",
                         )
                     else:  # 避免过于频繁的print
@@ -219,7 +219,7 @@ def downloader(url, file_path, proxy_dict={}, silent=False):
                             percent_10x_last = percent_10x
 
         end_time = time.time()
-        if not silent:
+        if verbose:
             print("")
         print("下载完成！用时 %.2f 秒" % (end_time - start_time))
         return 0
@@ -333,8 +333,8 @@ def empty_dir(dir_path, to_trash=False, whitelist: list = []):
         return 0
 
 
-def empty_dir_interact(dir_path, to_trash=False, whitelist: list = [], confirm=True):
-    if confirm:
+def empty_dir_interact(dir_path, to_trash=False, whitelist: list = [], verbose=True):
+    if verbose:
         while True:
             print('是否清空"%s"？(Y/N) ' % dir_path, end="")
             input_confirm = input().upper()

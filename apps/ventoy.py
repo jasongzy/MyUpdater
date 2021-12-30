@@ -50,14 +50,14 @@ def init(check_release=True):
         app.release_file_url = app.get_download_url()
 
 
-def update(silent=False):
+def update(verbose=True):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
-    if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), silent,):
+    if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))
     whitelist = list(filter(None, whitelist))
-    file_io.empty_dir_interact(app.local_dir, True, whitelist, not silent)
+    file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose)
     file_io.unpack_zip(tmp_file, app.local_dir)
     file_io.cut_dir(
         os.path.join(app.local_dir, "ventoy-" + str(app.latest_version[1:])), app.local_dir,

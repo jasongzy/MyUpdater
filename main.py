@@ -120,7 +120,7 @@ class MyThread(QThread):
             self.module.init()
         elif self.action == "update":
             print("下载中...")
-            self.module.update(True)
+            self.module.update(verbose=False)
 
 
 class QLabelButton(QLabel):
@@ -186,7 +186,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.thread_update_dict[item] = MyThread(item, "update")
             self.thread_update_dict[item].finished.connect(self.update_ui_all)
             # 初始化各个APP的基本信息，但不检查更新
-            APP_DICT[item].init(False)
+            APP_DICT[item].init(check_release=False)
         # 添加表格内容
         row_index = 0  # 避免在循环内调用ROW_LIST.index(item)获取行号
         for item in ROW_LIST:
@@ -301,7 +301,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             # self.thread_init_dict[item].terminate()
             self.thread_init_dict[item].quit()
 
-    def update_ui(self, item="", info=True):
+    def update_ui(self, item="", verbose=True):
         if not item:
             item = QObject.sender(self).item
         row_index = ROW_LIST.index(item)
@@ -344,7 +344,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             '<html><head/><body><p><span style=" color:#fe4365;">%d</span></p></body></html>' % self.counter_num
         )
         self.checked_list.append(item)
-        if info:
+        if verbose:
             if set(ROW_LIST).issubset(self.checked_list):
                 print("全部检查完毕！")
 
@@ -358,7 +358,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def update_ui_all(self):
         self.counter_num = 0
         for item in ROW_LIST:
-            self.update_ui(item, False)
+            self.update_ui(item, verbose=False)
 
     def config_changed(self):
         self.config_watcher.removePath(CONFIG_PATH)
@@ -396,7 +396,7 @@ if __name__ == "__main__":
         QDesktopServices.openUrl(QUrl.fromLocalFile(CONFIG_PATH))
         sys.exit()
     for id in ROW_LIST:
-        enabled = file_io.get_config(id, "enabled", False)
+        enabled = file_io.get_config(id, "enabled", verbose=False)
         if enabled == "0":
             ROW_LIST.remove(id)
             APP_LIST.remove(globals()[id])

@@ -32,7 +32,7 @@ def oauth_test(oauth_token, proxy_dict={}):
     api = GITHUB_API + "/rate_limit"
     headers = {"Authorization": "token " + oauth_token}
     try:
-        response = requests.get(api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10,)
+        response = requests.get(api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10)
     except requests.exceptions.ReadTimeout:
         print("Request timeout")
         return -1
@@ -75,7 +75,7 @@ class GitHubRelease:
         if not include_pre:
             api += "/latest"
         try:
-            response = requests.get(api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10,)
+            response = requests.get(api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10)
         except requests.exceptions.ReadTimeout:
             print("Request timeout")
             return
@@ -116,26 +116,26 @@ class GitHubRelease:
         else:
             return self.get_download_url_by(self.release_file_name, "name")
 
-    def is_latest(self, info=False):
+    def is_latest(self, verbose=False):
         if not self.local_version:
-            if info:
+            if verbose:
                 print("请先获取本地版本号，再进行版本比对！")
             return -1
         if not self.latest_version:
-            if info:
+            if verbose:
                 print("请先获取最新版本号，再进行版本比对！")
             return -2
         diff = _version_compare(self.local_version, self.latest_version)
         if diff == 0:
-            if info:
+            if verbose:
                 print("已为最新版本！")
             return 1
         elif diff > 0:
-            if info:
+            if verbose:
                 print("当前版本高于最新版本！")
             return 1
         else:
-            if info:
+            if verbose:
                 print("非最新版！")
                 print("最新版本：" + self.latest_version)
                 print("Release 文件如下：")
@@ -153,7 +153,7 @@ class GitHubRelease:
 
     def update_interact(self, update):
         print("当前版本：" + self.local_version)
-        if self.is_latest(True) == 0:
+        if self.is_latest(verbose=True) == 0:
             while True:
                 print("是否下载更新？(Y/N) ", end="")
                 choice = input().upper()

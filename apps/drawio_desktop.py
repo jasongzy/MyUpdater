@@ -38,7 +38,7 @@ def init(check_release=True):
         app.release_file_url = app.get_download_url()
 
 
-def update(silent=False):
+def update(verbose=True):
     file = os.path.join(app.local_dir, FILENAME)
     if os.path.isfile(file):
         old_exist = True
@@ -46,7 +46,7 @@ def update(silent=False):
         old_exist = False
     if old_exist:
         os.rename(file, file + ".old")
-    if file_io.downloader(app.release_file_url, file, file_io.get_config("common", "proxy_dict"), silent,):
+    if file_io.downloader(app.release_file_url, file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:
