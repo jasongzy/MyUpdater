@@ -1,5 +1,6 @@
 import os
 import sys
+from time import sleep
 
 sys.path.append("..")
 import utils.file_io as file_io
@@ -44,6 +45,7 @@ def update(verbose=True):
     if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
     file_io.terminate_process(FILENAME, verbose=verbose)
+    sleep(1)
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))
     whitelist = list(filter(None, whitelist))
