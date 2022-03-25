@@ -47,7 +47,8 @@ def update(verbose=True):
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))
     whitelist = list(filter(None, whitelist))
-    file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose)
+    if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
+        return -1
     if os.path.splitext(app.release_file_name)[1] == ".7z":
         file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
     else:

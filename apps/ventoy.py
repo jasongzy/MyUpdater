@@ -57,7 +57,8 @@ def update(verbose=True):
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))
     whitelist = list(filter(None, whitelist))
-    file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose)
+    if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
+        return -1
     file_io.unpack_zip(tmp_file, app.local_dir)
     file_io.cut_dir(
         os.path.join(app.local_dir, "ventoy-" + str(app.latest_version[1:])), app.local_dir,

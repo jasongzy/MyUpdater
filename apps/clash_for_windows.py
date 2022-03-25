@@ -45,11 +45,14 @@ def update(verbose=True):
     if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
     file_io.terminate_process(FILENAME, verbose=verbose)
+    file_io.terminate_process("clash-win64.exe", verbose=verbose)
+    file_io.terminate_process("clash-core-service.exe", verbose=verbose)
     sleep(1)
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))
     whitelist = list(filter(None, whitelist))
-    file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose)
+    if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
+        return -1
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:

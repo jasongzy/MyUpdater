@@ -339,22 +339,24 @@ def empty_dir_interact(dir_path, to_trash=False, whitelist: list = [], verbose=T
             print('是否清空"%s"？(Y/N) ' % dir_path, end="")
             input_confirm = input().upper()
             if input_confirm == "N":
-                return
+                return -1
             elif input_confirm == "Y":
                 break
             else:
                 continue
-    while True:
-        result = empty_dir(dir_path, to_trash, whitelist)
-        if result == -1:
-            while True:
-                print("是否重试？(Y/N) ", end="")
-                input_retry = input().upper()
-                if input_retry == "N":
-                    return
-                elif input_retry == "Y":
-                    break
-                else:
-                    continue
-        else:
-            return
+        while True:
+            result = empty_dir(dir_path, to_trash, whitelist)
+            if result == -1:
+                while True:
+                    print("是否重试？(Y/N) ", end="")
+                    input_retry = input().upper()
+                    if input_retry == "N":
+                        return -1
+                    elif input_retry == "Y":
+                        break
+                    else:
+                        continue
+            else:
+                return 0
+    else:
+        return empty_dir(dir_path, to_trash, whitelist)

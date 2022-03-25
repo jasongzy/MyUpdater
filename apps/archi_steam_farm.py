@@ -59,7 +59,8 @@ def update(verbose=True):
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))
     whitelist = list(filter(None, whitelist))
-    file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose)
+    if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
+        return -1
     file_io.unpack_zip(tmp_file, app.local_dir)
     # app.local_version = get_asf_version()
     app.local_version = file_io.get_exe_version(app.exe_path)
