@@ -215,12 +215,11 @@ def downloader(url, file_path, proxy_dict={}, verbose=True):
                         if "percent_10x_last" not in dir():  # 未定义变量（第一次循环）
                             percent_10x_last = -1
                         if percent_10x % 100 == 0 and percent_10x != percent_10x_last:
-                            print("[下载进度]: %s%.2f%%" % (">" * int(size * 50 / file_size), percent))
+                            print("\r" + "[下载进度]: %s%.2f%%" % (">" * int(size * 50 / file_size), percent), end="")
                             percent_10x_last = percent_10x
 
         end_time = time.time()
-        if verbose:
-            print("")
+        print("")
         print("下载完成！用时 %.2f 秒" % (end_time - start_time))
         return 0
     else:

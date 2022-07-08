@@ -293,6 +293,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     # 将标准输出重定向到UI所用的*槽函数*
     def print_UI(self, info: str):
         self.terminalText.moveCursor(QTextCursor.End)
+        if info.startswith("\r"):
+            lastLine = self.terminalText.textCursor()
+            lastLine.select(QTextCursor.LineUnderCursor)
+            lastLine.removeSelectedText()
+            self.terminalText.moveCursor(QTextCursor.StartOfLine, QTextCursor.MoveAnchor)
+            info = info.strip("\r")
         self.terminalText.insertPlainText(info)
         QCoreApplication.processEvents(QEventLoop.ExcludeUserInputEvents | QEventLoop.ExcludeSocketNotifiers)
 
