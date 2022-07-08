@@ -76,6 +76,6 @@ def update(verbose=True):
 
 if __name__ == "__main__":
     if file_io.update_config("../config.ini"):
-        exit(1)
+        sys.exit(1)
     init()
     app.update_interact(update)

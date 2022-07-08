@@ -404,7 +404,7 @@ if __name__ == "__main__":
     if file_io.update_config(CONFIG_PATH):
         QMessageBox.critical(None, "错误", "配置文件存在严重错误，\n请修正后再启动！")
         QDesktopServices.openUrl(QUrl.fromLocalFile(CONFIG_PATH))
-        sys.exit()
+        sys.exit(1)
     for id in ROW_LIST:
         enabled = file_io.get_config(id, "enabled", verbose=False)
         if enabled == "0":
