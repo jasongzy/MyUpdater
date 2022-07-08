@@ -61,12 +61,9 @@ def update(verbose=True):
     if file_io.downloader(app.release_file_url, new_file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
     if old_exist:
-        os.rename(old_file, old_file + ".old")
-        old_file += ".old"
+        file_io.send2trash(old_file)
     app.local_version = get_prober_version()
     if app.is_latest() == 1:
-        if old_exist:
-            os.remove(old_file)
         print("X Prober %s 更新成功！" % app.local_version)
         return 0
     else:

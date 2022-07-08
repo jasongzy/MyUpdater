@@ -41,17 +41,11 @@ def init(check_release=True):
 def update(verbose=True):
     file = os.path.join(app.local_dir, FILENAME)
     if os.path.isfile(file):
-        old_exist = True
-    else:
-        old_exist = False
-    if old_exist:
-        os.rename(file, file + ".old")
+        file_io.send2trash(file)
     if file_io.downloader(app.release_file_url, file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:
-        if old_exist:
-            os.remove(file + ".old")
         print("drawio-desktop %s 更新成功！" % app.local_version)
         return 0
     else:
