@@ -3,8 +3,6 @@ import os
 import shutil
 import time
 import zipfile
-from ctypes import Structure, addressof, byref, c_uint, create_unicode_buffer, windll
-from ctypes.wintypes import BOOL, HWND, LPCWSTR, UINT  # for send2trash
 from subprocess import call
 
 import requests
@@ -12,22 +10,25 @@ import win32api
 
 CONFIG = {}
 
-# for send2trash
-class SHFILEOPSTRUCTW(Structure):
-    _fields_ = [
-        ("hwnd", HWND),
-        ("wFunc", UINT),
-        ("pFrom", LPCWSTR),
-        ("pTo", LPCWSTR),
-        ("fFlags", c_uint),
-        ("fAnyOperationsAborted", BOOL),
-        ("hNameMappings", c_uint),
-        ("lpszProgressTitle", LPCWSTR),
-    ]
 
-
-# https://pypi.org/project/Send2Trash
 def send2trash(path):
+    """https://pypi.org/project/Send2Trash
+    """
+    from ctypes import Structure, addressof, byref, c_uint, create_unicode_buffer, windll
+    from ctypes.wintypes import BOOL, HWND, LPCWSTR, UINT
+
+    class SHFILEOPSTRUCTW(Structure):
+        _fields_ = [
+            ("hwnd", HWND),
+            ("wFunc", UINT),
+            ("pFrom", LPCWSTR),
+            ("pTo", LPCWSTR),
+            ("fFlags", c_uint),
+            ("fAnyOperationsAborted", BOOL),
+            ("hNameMappings", c_uint),
+            ("lpszProgressTitle", LPCWSTR),
+        ]
+
     shell32 = windll.shell32
     SHFileOperationW = shell32.SHFileOperationW
     FO_MOVE = 1
@@ -294,15 +295,18 @@ def empty_dir(dir_path, to_trash=False, whitelist: list = []):
         print("目标目录不存在：" + dir_path)
         return -2
 
-    # todo 暂时无法在放入回收站时实现白名单忽略
-    if whitelist:
-        to_trash = False
-
     if to_trash:
+        if whitelist:
+            tmp_dir = os.path.join(os.environ.get("TEMP"), "updater_whitelist_" + os.path.basename(dir_path))
+            os.mkdir(tmp_dir)
+            for item in os.listdir(dir_path):
+                if item in whitelist:
+                    shutil.move(os.path.join(dir_path, item), os.path.join(tmp_dir, item))
         if send2trash(dir_path):
             print("无法删除：" + dir_path)
         else:
             os.mkdir(dir_path)
+            cut_dir(tmp_dir, dir_path)
     else:
         for item in os.listdir(dir_path):
             if item in whitelist:
