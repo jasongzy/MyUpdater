@@ -86,9 +86,10 @@ def update_config(path):
     return 0
 
 
-def get_config(section, key, verbose=True):
+def get_config(section, key, default="", verbose=True):
+    global CONFIG
     if section in CONFIG:
-        return CONFIG[section].get(key, "")
+        return CONFIG[section].get(key, default)
     else:
         if verbose:
             print("配置文件中 " + section + " 项不存在！")

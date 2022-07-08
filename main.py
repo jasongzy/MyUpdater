@@ -1,5 +1,6 @@
 import os
 import sys
+from importlib import import_module
 
 from PyQt5.QtCore import (
     QCoreApplication,
@@ -24,18 +25,6 @@ from PyQt5.QtWidgets import (
     QTableWidgetItem,
 )
 
-import apps.archi_steam_farm as asf
-import apps.clash_for_windows as cfw
-import apps.drawio_desktop as drawio
-import apps.mimikatz as mimikatz
-import apps.office_tool_plus as otp
-import apps.qtscrcpy as qtscrcpy
-import apps.scrcpy as scrcpy
-import apps.sharex as sharex
-import apps.texstudio as texstudio
-import apps.ventoy as ventoy
-import apps.waifu2x_extension_gui as waifu
-import apps.x_prober as xprober
 import utils.file_io as file_io
 from Ui_updater import Ui_MainWindow
 
@@ -48,66 +37,7 @@ COL_GITHUB_BUTTON = 5
 COL_PATH_BUTTON = 6
 COL_UPDATE_BUTTON = 7
 
-ROW_LIST = [
-    "asf",
-    "cfw",
-    "drawio",
-    "mimikatz",
-    "otp",
-    "qtscrcpy",
-    "scrcpy",
-    "sharex",
-    "texstudio",
-    "ventoy",
-    "waifu",
-    "xprober",
-]
-NAME_DICT = dict(
-    zip(
-        ROW_LIST,
-        [
-            "ArchiSteamFarm",
-            "Clash for Windows",
-            "draw.io Desktop",
-            "mimikatz",
-            "Office Tool Plus",
-            "QtScrcpy",
-            "scrcpy",
-            "ShareX",
-            "TeXstudio",
-            "Ventoy",
-            "Waifu2x Extension GUI",
-            "X Prober",
-        ],
-    )
-)
 RES_DIR = "res/"
-LOGO_DICT = dict(
-    zip(
-        ROW_LIST,
-        list(
-            map(
-                lambda x: RES_DIR + x,
-                [
-                    "logo_asf.png",
-                    "logo_clash.png",
-                    "logo_drawio.png",
-                    "logo_mimikatz.png",
-                    "logo_otp.png",
-                    "logo_qtscrcpy.png",
-                    "logo_scrcpy.png",
-                    "logo_sharex.png",
-                    "logo_texstudio.png",
-                    "logo_ventoy.png",
-                    "logo_waifu.png",
-                    "php_elephant.png",
-                ],
-            )
-        ),
-    )
-)
-APP_LIST = [asf, cfw, drawio, mimikatz, otp, qtscrcpy, scrcpy, sharex, texstudio, ventoy, waifu, xprober]
-APP_DICT = dict(zip(ROW_LIST, APP_LIST))
 CONFIG_PATH = "./config.ini"
 PWD = os.getcwd()
 
@@ -177,7 +107,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.update_button_dict = {}
         self.thread_init_dict = {}
         self.thread_update_dict = {}
-        for item in ROW_LIST:
+        for item in ID_LIST:
             self.update_button_dict[item] = QLabelButton()
             self.thread_init_dict[item] = MyThread(item, "init")
             # 用 lambda 传递额外的参数
@@ -193,7 +123,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             APP_DICT[item].init(check_release=False)
         # 添加表格内容
         row_index = 0  # 避免在循环内调用ROW_LIST.index(item)获取行号
-        for item in ROW_LIST:
+        for item in ID_LIST:
             self.tableWidget.insertRow(row_index)
             self.tableWidget.setRowHeight(row_index, 64)
             # name
@@ -303,18 +233,18 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         QCoreApplication.processEvents(QEventLoop.ExcludeUserInputEvents | QEventLoop.ExcludeSocketNotifiers)
 
     def thread_start_all(self):
-        for item in ROW_LIST:
+        for item in ID_LIST:
             self.thread_init_dict[item].start()
 
     def thread_stop_all(self):
-        for item in ROW_LIST:
+        for item in ID_LIST:
             # self.thread_init_dict[item].terminate()
             self.thread_init_dict[item].quit()
 
     def update_ui(self, item="", verbose=True):
         if not item:
             item = QObject.sender(self).item
-        row_index = ROW_LIST.index(item)
+        row_index = ID_LIST.index(item)
         app = APP_DICT[item].app
         version_font = QFont()
         version_font.setFamily("Arial")
@@ -355,7 +285,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         )
         self.checked_list.append(item)
         if verbose:
-            if set(ROW_LIST).issubset(self.checked_list):
+            if set(ID_LIST).issubset(self.checked_list):
                 print("全部检查完毕！")
 
     # def set_row_background_color(self, row_index, r, g, b):
@@ -367,7 +297,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def update_ui_all(self):
         self.counter_num = 0
-        for item in ROW_LIST:
+        for item in ID_LIST:
             self.update_ui(item, verbose=False)
 
     def config_changed(self):
@@ -405,14 +335,22 @@ if __name__ == "__main__":
         QMessageBox.critical(None, "错误", "配置文件存在严重错误，\n请修正后再启动！")
         QDesktopServices.openUrl(QUrl.fromLocalFile(CONFIG_PATH))
         sys.exit(1)
-    for id in ROW_LIST:
-        enabled = file_io.get_config(id, "enabled", verbose=False)
+
+    ID_LIST = list(file_io.CONFIG.keys())
+    ID_LIST.remove("common")
+    ID_LIST.sort()
+    for id in ID_LIST:
+        enabled = file_io.get_config(id, "enabled")
         if enabled == "0":
-            ROW_LIST.remove(id)
-            APP_LIST.remove(globals()[id])
-            NAME_DICT.pop(id)
-            LOGO_DICT.pop(id)
-            APP_DICT.pop(id)
+            ID_LIST.remove(id)
+    APP_DICT = dict(
+        zip(ID_LIST, map(lambda id: import_module("apps." + file_io.get_config(id, "module", id)), ID_LIST))
+    )
+    NAME_DICT = dict(zip(ID_LIST, map(lambda id: file_io.get_config(id, "name", id), ID_LIST)))
+    LOGO_DICT = dict(
+        zip(ID_LIST, map(lambda id: RES_DIR + file_io.get_config(id, "logo", "logo_%s.png" % id), ID_LIST))
+    )
+
     MainWindow = MyMainWindow()
     MainWindow.show()
     sys.exit(MainApp.exec_())
