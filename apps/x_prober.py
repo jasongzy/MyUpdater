@@ -64,7 +64,7 @@ def update(verbose=True):
         file_io.send2trash(old_file)
     app.local_version = get_prober_version()
     if app.is_latest() == 1:
-        print("X Prober %s 更新成功！" % app.local_version)
+        print("%s %s 更新成功！" % (file_io.get_config(ID, "name", ID), app.local_version))
         return 0
     else:
         print("校验失败，请重新下载！")

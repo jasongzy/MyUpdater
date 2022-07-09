@@ -66,7 +66,7 @@ def update(verbose=True):
     app.local_version = get_ventoy_version()
     if app.is_latest() == 1:
         os.remove(tmp_file)
-        print("Ventoy %s 更新成功！" % app.local_version)
+        print("%s %s 更新成功！" % (file_io.get_config(ID, "name", ID), app.local_version))
         return 0
     else:
         print("校验失败，请重新下载！")

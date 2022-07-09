@@ -46,7 +46,7 @@ def update(verbose=True):
         return -1
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:
-        print("drawio-desktop %s 更新成功！" % app.local_version)
+        print("%s %s 更新成功！" % (file_io.get_config(ID, "name", ID), app.local_version))
         return 0
     else:
         print("校验失败，请重新下载！")

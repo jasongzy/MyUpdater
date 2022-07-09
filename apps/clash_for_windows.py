@@ -57,7 +57,7 @@ def update(verbose=True):
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:
         os.remove(tmp_file)
-        print("Clash for Windows %s 更新成功！" % app.local_version)
+        print("%s %s 更新成功！" % (file_io.get_config(ID, "name", ID), app.local_version))
         os.popen('"%s"' % app.exe_path)
         return 0
     else:
