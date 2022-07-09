@@ -96,6 +96,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         # 行宽、列高均分整个窗口
         # self.tableWidget.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # self.tableWidget.horizontalHeader().sectionResized.connect(self.tableWidget.resizeRowsToContents)
         # 表格不可编辑、不可选中
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.setSelectionMode(QAbstractItemView.NoSelection)
@@ -123,7 +124,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             APP_DICT[item].init(check_release=False)
         # 添加表格内容
         row_index = 0  # 避免在循环内调用ROW_LIST.index(item)获取行号
-        for item in ID_LIST:
+        for row_index, item in enumerate(ID_LIST):
             self.tableWidget.insertRow(row_index)
             self.tableWidget.setRowHeight(row_index, 64)
             # name
@@ -132,7 +133,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             # logo
             label_logo = QLabelButton()
             label_logo.setPixmap(QPixmap(LOGO_DICT[item]).scaledToWidth(40))
+            label_logo.setCursor(QCursor(Qt.PointingHandCursor))
             label_logo.setAlignment(Qt.AlignCenter)
+            label_logo.setToolTip("双击运行")
             self.tableWidget.setCellWidget(row_index, COL_LOGO, label_logo)
             label_logo.DoubleClicked.connect(
                 lambda exe=APP_DICT[item].app.exe_path: (
@@ -154,6 +157,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             label_dir = QLabelButton()
             label_dir.setPixmap(QPixmap(RES_DIR + "folder.svg").scaledToWidth(35))
             label_dir.setCursor(QCursor(Qt.PointingHandCursor))
+            label_dir.setToolTip(APP_DICT[item].app.local_dir)
             label_dir.setAlignment(Qt.AlignCenter)
             self.tableWidget.setCellWidget(row_index, COL_PATH_BUTTON, label_dir)
             label_dir.clicked.connect(
@@ -174,8 +178,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             desc_font.setPixelSize(14)
             desc.setFont(desc_font)
             self.tableWidget.setItem(row_index, COL_DESC, desc)
-            # 记得手动更新row_index
-            row_index += 1
 
         # 手动调整列宽
         self.tableWidget.horizontalHeader().setSectionResizeMode(COL_LOGO, QHeaderView.Interactive)
@@ -254,11 +256,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         local_version = QTableWidgetItem(app.local_version)
         local_version.setFont(version_font)
         local_version.setTextAlignment(Qt.AlignCenter)
+        local_version.setToolTip(app.local_version)
         self.tableWidget.setItem(row_index, COL_LOCAL_VERSION, local_version)
         # latest_version
         latest_version = QTableWidgetItem(app.latest_version)
         latest_version.setFont(version_font)
         latest_version.setTextAlignment(int(Qt.AlignLeft | Qt.AlignVCenter))
+        latest_version.setToolTip(app.latest_version)
         self.tableWidget.setItem(row_index, COL_LATEST_VERSION, latest_version)
         is_latest = app.is_latest()
         if is_latest == 1:
