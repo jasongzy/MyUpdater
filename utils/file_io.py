@@ -306,7 +306,8 @@ def empty_dir(dir_path, to_trash=False, whitelist: list = []):
             print("无法删除：" + dir_path)
         else:
             os.mkdir(dir_path)
-            cut_dir(tmp_dir, dir_path)
+            if whitelist:
+                cut_dir(tmp_dir, dir_path)
     else:
         for item in os.listdir(dir_path):
             if item in whitelist:
