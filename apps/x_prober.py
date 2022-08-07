@@ -49,7 +49,9 @@ def init(check_release=True):
             include_pre = 0
     if check_release:
         app.check_release(
-            include_pre, file_io.get_config("common", "proxy_dict"), file_io.get_config("common", "github_oauth"),
+            include_pre,
+            file_io.get_config("common", "proxy_dict"),
+            file_io.get_config("common", "github_oauth"),
         )
 
 

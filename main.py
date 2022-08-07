@@ -307,7 +307,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def config_changed(self):
         self.config_watcher.removePath(CONFIG_PATH)
         choice = QMessageBox.information(
-            self, "配置文件已修改", "新配置将在软件重启后生效\n是否重新启动？", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes,
+            self,
+            "配置文件已修改",
+            "新配置将在软件重启后生效\n是否重新启动？",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
         )
         if choice == QMessageBox.Yes:
             MainApp.quit()

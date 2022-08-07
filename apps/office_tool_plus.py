@@ -31,7 +31,9 @@ def init(check_release=True):
             include_pre = 0
     if check_release:
         app.check_release(
-            include_pre, file_io.get_config("common", "proxy_dict"), file_io.get_config("common", "github_oauth"),
+            include_pre,
+            file_io.get_config("common", "proxy_dict"),
+            file_io.get_config("common", "github_oauth"),
         )
         # Release 文件名包含版本号
         # 在配置文件中用$代替
@@ -54,7 +56,8 @@ def update(verbose=True):
     else:
         file_io.unpack_zip(tmp_file, app.local_dir)
     file_io.cut_dir(
-        os.path.join(app.local_dir, "Office Tool"), app.local_dir,
+        os.path.join(app.local_dir, "Office Tool"),
+        app.local_dir,
     )
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:

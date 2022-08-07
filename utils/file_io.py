@@ -12,8 +12,7 @@ CONFIG = {}
 
 
 def send2trash(path):
-    """https://pypi.org/project/Send2Trash
-    """
+    """https://pypi.org/project/Send2Trash"""
     from ctypes import Structure, addressof, byref, c_uint, create_unicode_buffer, windll
     from ctypes.wintypes import BOOL, HWND, LPCWSTR, UINT
 
