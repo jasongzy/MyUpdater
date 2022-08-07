@@ -25,12 +25,14 @@ def _version_compare(a: str, b: str, split="."):
     return 0
 
 
-def oauth_test(oauth_token, proxy_dict={}):
+def oauth_test(oauth_token, proxy_dict: dict = None):
     # 0: OAuth ok
     # 1: no OAuth
     # -1: failed
     api = GITHUB_API + "/rate_limit"
     headers = {"Authorization": "token " + oauth_token}
+    if proxy_dict is None:
+        proxy_dict = {}
     try:
         response = requests.get(api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10)
     except requests.exceptions.ReadTimeout:
@@ -69,11 +71,13 @@ class GitHubRelease:
         self.repo = repo
         self.repo_url = "https://github.com/" + repo
 
-    def check_release(self, include_pre=False, proxy_dict={}, oauth_token=""):
+    def check_release(self, include_pre=False, proxy_dict: dict = None, oauth_token=""):
         api = GITHUB_API + "/repos/" + self.repo + "/releases"
         headers = {"Authorization": "token " + oauth_token} if oauth_token else {}
         if not include_pre:
             api += "/latest"
+        if proxy_dict is None:
+            proxy_dict = {}
         try:
             response = requests.get(api, headers=headers, allow_redirects=False, proxies=proxy_dict, timeout=10)
         except requests.exceptions.ReadTimeout:

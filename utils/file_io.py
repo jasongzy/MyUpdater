@@ -149,7 +149,7 @@ def cut_dir(src_dir, dest_dir, remove_old_dir=True):
     return 0
 
 
-def downloader(url, file_path, proxy_dict={}, verbose=True):
+def downloader(url, file_path, proxy_dict: dict = None, verbose=True):
     # 路径合法性检测
     dest_dir = os.path.dirname(file_path)
     if not os.path.exists(dest_dir):
@@ -158,6 +158,8 @@ def downloader(url, file_path, proxy_dict={}, verbose=True):
     if os.path.isdir(file_path):
         print("目标路径错误！请输入文件路径，而非目录")
         return -1
+    if proxy_dict is None:
+        proxy_dict = {}
     if verbose:
         if os.path.isfile(file_path):
             while True:
@@ -289,11 +291,14 @@ def unpack_7z(exe_path, file_path, dest_dir):
     return 0
 
 
-def empty_dir(dir_path, to_trash=False, whitelist: list = []):
+def empty_dir(dir_path, to_trash=False, whitelist: list = None):
     # 路径合法性检测
     if not os.path.isdir(dir_path):
         print("目标目录不存在：" + dir_path)
         return -2
+
+    if whitelist is None:
+        whitelist = []
 
     if to_trash:
         if whitelist:
@@ -338,7 +343,9 @@ def empty_dir(dir_path, to_trash=False, whitelist: list = []):
         return 0
 
 
-def empty_dir_interact(dir_path, to_trash=False, whitelist: list = [], verbose=True):
+def empty_dir_interact(dir_path, to_trash=False, whitelist: list = None, verbose=True):
+    if whitelist is None:
+        whitelist = []
     if verbose:
         while True:
             print('是否清空"%s"？(Y/N) ' % dir_path, end="")
