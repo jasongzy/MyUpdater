@@ -52,7 +52,7 @@ def init(check_release=True):
         # 在配置文件中用$代替
         #! 支持增量更新：模糊查找
         app.release_file_name = file_io.get_config(ID, "release_file").split("$", 1)[0]
-        app.release_file_url = app.get_download_url(fuzzy=True)
+        app.release_file_url = app.get_download_url(fuzzy=True, ext="7z")
 
 
 def update(verbose=True):

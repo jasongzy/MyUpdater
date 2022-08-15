@@ -110,10 +110,10 @@ class GitHubRelease:
                 return item["browser_download_url"]
         return ""
 
-    def get_download_url(self, fuzzy=False):
+    def get_download_url(self, fuzzy=False, ext=""):
         if fuzzy:
             for item in self.release_assets:
-                if item["name"].startswith(self.release_file_name):
+                if item["name"].startswith(self.release_file_name) and (ext == "" or item["name"].endswith(f".{ext}")):
                     self.release_file_name = item["name"]
                     return item["browser_download_url"]
             return ""

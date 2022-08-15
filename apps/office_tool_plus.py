@@ -39,7 +39,7 @@ def init(check_release=True):
         # 在配置文件中用$代替
         # !但实际版本号与文件名并不总是一致，因此采用模糊查找
         app.release_file_name = file_io.get_config(ID, "release_file").split("$", 1)[0]
-        app.release_file_url = app.get_download_url(fuzzy=True)
+        app.release_file_url = app.get_download_url(fuzzy=True, ext="7z")
 
 
 def update(verbose=True):
@@ -51,10 +51,7 @@ def update(verbose=True):
     whitelist = list(filter(None, whitelist))
     if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
         return -1
-    if os.path.splitext(app.release_file_name)[1] == ".7z":
-        file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
-    else:
-        file_io.unpack_zip(tmp_file, app.local_dir)
+    file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
     file_io.cut_dir(
         os.path.join(app.local_dir, "Office Tool"),
         app.local_dir,
