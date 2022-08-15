@@ -29,8 +29,8 @@ def oauth_test(oauth_token, proxy_dict: dict = None):
     # 0: OAuth ok
     # 1: no OAuth
     # -1: failed
-    api = GITHUB_API + "/rate_limit"
-    headers = {"Authorization": "token " + oauth_token}
+    api = f"{GITHUB_API}/rate_limit"
+    headers = {"Authorization": f"token {oauth_token}"}
     if proxy_dict is None:
         proxy_dict = {}
     try:
@@ -49,7 +49,7 @@ def oauth_test(oauth_token, proxy_dict: dict = None):
         else:
             return 1
     else:
-        print("Request failed: %d" % response.status_code)
+        print(f"Request failed: {response.status_code}")
         return -1
 
 
@@ -69,11 +69,11 @@ class GitHubRelease:
 
     def __init__(self, repo: str):
         self.repo = repo
-        self.repo_url = "https://github.com/" + repo
+        self.repo_url = f"https://github.com/{repo}"
 
     def check_release(self, include_pre=False, proxy_dict: dict = None, oauth_token=""):
-        api = GITHUB_API + "/repos/" + self.repo + "/releases"
-        headers = {"Authorization": "token " + oauth_token} if oauth_token else {}
+        api = f"{GITHUB_API}/repos/{self.repo}/releases"
+        headers = {"Authorization": f"token {oauth_token}"} if oauth_token else {}
         if not include_pre:
             api += "/latest"
         if proxy_dict is None:
@@ -96,13 +96,13 @@ class GitHubRelease:
             if self.release_file_name:
                 self.release_file_url = self.get_download_url()
         else:
-            print("Request failed: %d" % response.status_code)
+            print(f"Request failed: {response.status_code}")
 
     def print_assets(self):
         for item in self.release_assets:
             print(item["name"], end="\t")
             print(" | ", end="")
-            print("%.2f MB" % (int(item["size"]) / 1024 / 1024))
+            print("{:.2f} MB".format(int(item["size"]) / 1024 / 1024))
 
     def get_download_url_by(self, value, key="name"):
         for item in self.release_assets:
@@ -141,13 +141,13 @@ class GitHubRelease:
         else:
             if verbose:
                 print("非最新版！")
-                print("最新版本：" + self.latest_version)
+                print(f"最新版本：{self.latest_version}")
                 print("Release 文件如下：")
                 print("-" * 40)
                 self.print_assets()
                 print("-" * 40)
                 if self.release_file_url:
-                    print("其中 " + self.release_file_name + " 的下载链接为：")
+                    print(f"其中 {self.release_file_name} 的下载链接为：")
                     print(self.release_file_url)
                 else:
                     print("未找到指定的 Release 文件！")
@@ -156,7 +156,7 @@ class GitHubRelease:
             return 0
 
     def update_interact(self, update):
-        print("当前版本：" + self.local_version)
+        print(f"当前版本：{self.local_version}")
         if self.is_latest(verbose=True) == 0:
             while True:
                 print("是否下载更新？(Y/N) ", end="")

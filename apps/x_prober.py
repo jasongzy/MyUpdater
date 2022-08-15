@@ -35,7 +35,7 @@ def init(check_release=True):
     app.release_file_name = file_io.get_config(ID, "release_file")
     app.local_dir = file_io.get_config(ID, "path")
     if not os.path.isdir(app.local_dir):
-        print('本地目录配置有误："' + app.local_dir + '" 不存在！')
+        print(f'本地目录配置有误："{app.local_dir}" 不存在！')
         return
     app.local_version = get_prober_version()
     if current_filename:
@@ -45,7 +45,7 @@ def init(check_release=True):
         try:
             include_pre = int(include_pre)
         except:
-            print("[%s] Pre-release 开关配置有误" % ID)
+            print(f"[{ID}] Pre-release 开关配置有误")
             include_pre = 0
     if check_release:
         app.check_release(
@@ -59,14 +59,14 @@ def update(verbose=True):
     old_exist = bool(current_filename)
     if old_exist:
         old_file = os.path.join(app.local_dir, current_filename)
-    new_file = os.path.join(app.local_dir, "xprober_" + app.latest_version + ".php")
+    new_file = os.path.join(app.local_dir, f"xprober_{app.latest_version}.php")
     if file_io.downloader(app.release_file_url, new_file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
     if old_exist:
         file_io.send2trash(old_file)
     app.local_version = get_prober_version()
     if app.is_latest() == 1:
-        print("%s %s 更新成功！" % (file_io.get_config(ID, "name", ID), app.local_version))
+        print("{} {} 更新成功！".format(file_io.get_config(ID, "name", ID), app.local_version))
         return 0
     else:
         print("校验失败，请重新下载！")

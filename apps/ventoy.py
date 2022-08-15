@@ -29,7 +29,7 @@ def get_ventoy_version():
 def init(check_release=True):
     app.local_dir = file_io.get_config(ID, "path")
     if not os.path.isdir(app.local_dir):
-        print('本地目录配置有误："' + app.local_dir + '" 不存在！')
+        print(f'本地目录配置有误："{app.local_dir}" 不存在！')
         return
     app.exe_path = os.path.join(app.local_dir, FILENAME)
     app.local_version = get_ventoy_version()
@@ -38,7 +38,7 @@ def init(check_release=True):
         try:
             include_pre = int(include_pre)
         except:
-            print("[%s] Pre-release 开关配置有误" % ID)
+            print(f"[{ID}] Pre-release 开关配置有误")
             include_pre = 0
     if check_release:
         app.check_release(
@@ -69,7 +69,7 @@ def update(verbose=True):
     app.local_version = get_ventoy_version()
     if app.is_latest() == 1:
         os.remove(tmp_file)
-        print("%s %s 更新成功！" % (file_io.get_config(ID, "name", ID), app.local_version))
+        print("{} {} 更新成功！".format(file_io.get_config(ID, "name", ID), app.local_version))
         return 0
     else:
         print("校验失败，请重新下载！")

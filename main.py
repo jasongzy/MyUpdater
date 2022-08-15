@@ -146,7 +146,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             )
             # github_button
             label_github = QLabelButton()
-            label_github.setPixmap(QPixmap(RES_DIR + "github.svg").scaledToWidth(35))
+            label_github.setPixmap(QPixmap(os.path.join(RES_DIR, "github.svg")).scaledToWidth(35))
             label_github.setCursor(QCursor(Qt.PointingHandCursor))
             label_github.setAlignment(Qt.AlignCenter)
             label_github.setToolTip(APP_DICT[item].app.repo_url)
@@ -155,7 +155,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             label_github.clicked.connect(lambda url=APP_DICT[item].app.repo_url: QDesktopServices.openUrl(QUrl(url)))
             # path_button
             label_dir = QLabelButton()
-            label_dir.setPixmap(QPixmap(RES_DIR + "folder.svg").scaledToWidth(35))
+            label_dir.setPixmap(QPixmap(os.path.join(RES_DIR, "folder.svg")).scaledToWidth(35))
             label_dir.setCursor(QCursor(Qt.PointingHandCursor))
             label_dir.setToolTip(APP_DICT[item].app.local_dir)
             label_dir.setAlignment(Qt.AlignCenter)
@@ -165,7 +165,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             )
             # update_button
             label_update = self.update_button_dict[item]
-            label_update.setPixmap(QPixmap(RES_DIR + "update.svg").scaledToWidth(35))
+            label_update.setPixmap(QPixmap(os.path.join(RES_DIR, "update.svg")).scaledToWidth(35))
             label_update.setCursor(QCursor(Qt.PointingHandCursor))
             label_update.setAlignment(Qt.AlignCenter)
             label_update.setEnabled(False)
@@ -193,7 +193,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # 刷新按钮
         self.refreshButton.clicked.connect(self.onButtonClicked)
-        # self.refreshButton.setIcon(QIcon(RES_DIR + "refresh.svg"))
+        # self.refreshButton.setIcon(QIcon(os.path.join(RES_DIR, "refresh.svg")))
         # self.refreshButton.setIconSize(QSize(60, 60))
         self.checked_list = []  # 记录检查完毕的item
         self.counter_num = 0
@@ -266,26 +266,26 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.setItem(row_index, COL_LATEST_VERSION, latest_version)
         is_latest = app.is_latest()
         if is_latest == 1:
-            latest_version.setIcon(QIcon(RES_DIR + "equal.svg"))
+            latest_version.setIcon(QIcon(os.path.join(RES_DIR, "equal.svg")))
             self.update_button_dict[item].setEnabled(False)
         elif is_latest == 0:
-            latest_version.setIcon(QIcon(RES_DIR + "right.svg"))
+            latest_version.setIcon(QIcon(os.path.join(RES_DIR, "right.svg")))
             self.update_button_dict[item].setEnabled(True)
             self.counter_num += 1
             # self.set_row_background_color(row_index, 197, 237, 226)
         elif is_latest == -1:
             local_version.setText("未知")
-            latest_version.setIcon(QIcon(RES_DIR + "right.svg"))
+            latest_version.setIcon(QIcon(os.path.join(RES_DIR, "right.svg")))
             self.update_button_dict[item].setEnabled(True)
             self.counter_num += 1
         else:
-            latest_version.setIcon(QIcon(RES_DIR + "error.svg"))
+            latest_version.setIcon(QIcon(os.path.join(RES_DIR, "error.svg")))
             self.update_button_dict[item].setEnabled(False)
             # self.set_row_background_color(row_index, 250, 214, 214)
-            print("%s：无法找到最新版本下载地址！" % NAME_DICT[item])
+            print(f"{NAME_DICT[item]}：无法找到最新版本下载地址！")
 
         self.counter.setText(
-            '<html><head/><body><p><span style=" color:#fe4365;">%d</span></p></body></html>' % self.counter_num
+            f'<html><head/><body><p><span style=" color:#fe4365;">{self.counter_num}</span></p></body></html>'
         )
         self.checked_list.append(item)
         if verbose:
@@ -294,7 +294,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     # def set_row_background_color(self, row_index, r, g, b):
     #     self.tableWidget.cellWidget(row_index, COL_LOGO).setStyleSheet(
-    #         "QLabelButton{background-color:rgb(%d,%d,%d);}" % (r, g, b)
+    #         f"QLabelButton{{background-color:rgb({r},{g},{b});}}"
     #     )
     #     for col_index in range(COL_NAME, COL_LATEST_VERSION):
     #         self.tableWidget.item(row_index, col_index).setBackground(QColor(r, g, b))
@@ -356,7 +356,7 @@ if __name__ == "__main__":
     )
     NAME_DICT = dict(zip(ID_LIST, map(lambda id: file_io.get_config(id, "name", id), ID_LIST)))
     LOGO_DICT = dict(
-        zip(ID_LIST, map(lambda id: RES_DIR + file_io.get_config(id, "logo", "logo_%s.png" % id), ID_LIST))
+        zip(ID_LIST, map(lambda id: os.path.join(RES_DIR, file_io.get_config(id, "logo", f"logo_{id}.png")), ID_LIST))
     )
 
     MainWindow = MyMainWindow()

@@ -57,7 +57,7 @@ def send2trash(path):
 def read_config(path) -> dict:
     # 路径合法性检测
     if not os.path.isfile(path):
-        print("配置文件不存在：" + path)
+        print(f"配置文件不存在：{path}")
         return {}
     config = configparser.ConfigParser()
     config.optionxform = str  # key case sensitive
@@ -65,7 +65,7 @@ def read_config(path) -> dict:
         config.read(path, encoding="utf-8")
     except Exception as e:
         print(e)
-        print("配置文件有误：" + path)
+        print(f"配置文件有误：{path}")
         return {}
     return config._sections
 
@@ -92,16 +92,16 @@ def get_config(section, key, default="", verbose=True):
         return CONFIG[section].get(key, default)
     else:
         if verbose:
-            print("配置文件中 " + section + " 项不存在！")
+            print(f"配置文件中 {section} 项不存在！")
         return ""
 
 
 def terminate_process(name, verbose=False):
-    tasklist = "".join(os.popen('tasklist /FI "IMAGENAME eq %s"' % name).readlines())
+    tasklist = "".join(os.popen(f'tasklist /FI "IMAGENAME eq {name}"').readlines())
     if "PID" in tasklist:  # 进程存在
         if verbose:
             while True:
-                print("%s 正在运行，是否结束进程？(Y/N) " % name, end="")
+                print(f"{name} 正在运行，是否结束进程？(Y/N) ", end="")
                 choice = input().upper()
                 if choice == "N":
                     return
@@ -109,13 +109,13 @@ def terminate_process(name, verbose=False):
                     break
                 else:
                     continue
-        os.system('taskkill /F /IM "%s"' % name)
+        os.system(f'taskkill /F /IM "{name}"')
 
 
 def get_exe_version(path):
     # 路径合法性检测
     if not os.path.isfile(path):
-        print("目标文件不存在：" + path)
+        print(f"目标文件不存在：{path}")
         return "0.0.0.0"
 
     try:
@@ -126,17 +126,17 @@ def get_exe_version(path):
 
     ms = info["FileVersionMS"]
     ls = info["FileVersionLS"]
-    version = "%d.%d.%d.%d" % (win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls))
+    version = "{}.{}.{}.{}".format(win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls))
     return version
 
 
 def cut_dir(src_dir, dest_dir, remove_old_dir=True):
     # 路径合法性检测
     if not os.path.isdir(src_dir):
-        print("源目录不存在：" + src_dir)
+        print(f"源目录不存在：{src_dir}")
         return -1
     if not os.path.isdir(dest_dir):
-        print("目标目录不存在：" + dest_dir)
+        print(f"目标目录不存在：{dest_dir}")
         return -1
 
     for item in os.listdir(src_dir):
@@ -152,7 +152,7 @@ def downloader(url, file_path, proxy_dict: dict = None, verbose=True):
     # 路径合法性检测
     dest_dir = os.path.dirname(file_path)
     if not os.path.exists(dest_dir):
-        print("目标目录不存在：" + dest_dir)
+        print(f"目标目录不存在：{dest_dir}")
         return -1
     if os.path.isdir(file_path):
         print("目标路径错误！请输入文件路径，而非目录")
@@ -199,7 +199,7 @@ def downloader(url, file_path, proxy_dict: dict = None, verbose=True):
             print(e)
             return -1
         if file_response.status_code == requests.codes.ok:
-            print("[文件大小]: %0.2f MB" % (file_size / chunk_size / 1024))
+            print("[文件大小]: {:0.2f} MB".format(file_size / chunk_size / 1024))
             with open(file_path, "wb") as f:
                 for data in file_response.iter_content(chunk_size=chunk_size):
                     f.write(data)
@@ -208,7 +208,9 @@ def downloader(url, file_path, proxy_dict: dict = None, verbose=True):
                     if verbose:
                         print(
                             "\r"
-                            + "[下载进度]: %s%.2f%%" % (">" * int(size * 50 / file_size), float(size / file_size * 100)),
+                            + "[下载进度]: {}{:.2f}%".format(
+                                ">" * int(size * 50 / file_size), float(size / file_size * 100)
+                            ),
                             end="",
                         )
                     else:  # 避免过于频繁的print
@@ -218,15 +220,15 @@ def downloader(url, file_path, proxy_dict: dict = None, verbose=True):
                         if "percent_10x_last" not in dir():  # 未定义变量（第一次循环）
                             percent_10x_last = -1
                         if percent_10x % 100 == 0 and percent_10x != percent_10x_last:
-                            print("\r" + "[下载进度]: %s%.2f%%" % (">" * int(size * 50 / file_size), percent), end="")
+                            print("\r" + "[下载进度]: {}{:.2f}%".format(">" * int(size * 50 / file_size), percent), end="")
                             percent_10x_last = percent_10x
 
         end_time = time.time()
         print("")
-        print("下载完成！用时 %.2f 秒" % (end_time - start_time))
+        print("下载完成！用时 {:.2f} 秒".format(end_time - start_time))
         return 0
     else:
-        print("下载链接请求失败！响应状态码：" + str(file_response.status_code))
+        print(f"下载链接请求失败！响应状态码：{file_response.status_code}")
         return -1
 
 
@@ -235,7 +237,7 @@ def downloader_idm(exe_path, url, file_path):
     dest_dir = os.path.dirname(file_path)
     file_name = os.path.basename(file_path)
     if not os.path.exists(dest_dir):
-        print("目标目录不存在：" + dest_dir)
+        print(f"目标目录不存在：{dest_dir}")
         return -1
     if os.path.isdir(file_path):
         print("目标路径错误！请输入文件路径，而非目录")
@@ -254,7 +256,7 @@ def downloader_idm(exe_path, url, file_path):
 def unpack_zip(file_path, dest_dir):
     # 路径合法性检测
     if not os.path.exists(dest_dir):
-        print("目标目录不存在：" + dest_dir)
+        print(f"目标目录不存在：{dest_dir}")
         return -1
 
     try:
@@ -263,10 +265,10 @@ def unpack_zip(file_path, dest_dir):
         zfile.close()
         print("解压成功！")
     except FileNotFoundError:
-        print("文件不存在：" + file_path)
+        print(f"文件不存在：{file_path}")
         return -1
     except zipfile.BadZipFile:
-        print("文件损坏：" + file_path)
+        print(f"文件损坏：{file_path}")
         return -1
     except Exception as e:
         print(e)
@@ -277,13 +279,13 @@ def unpack_zip(file_path, dest_dir):
 def unpack_7z(exe_path, file_path, dest_dir):
     # 路径合法性检测
     if not os.path.exists(dest_dir):
-        print("目标目录不存在：" + dest_dir)
+        print(f"目标目录不存在：{dest_dir}")
         return -1
     if not os.path.exists(exe_path):
         print("7z.exe 不存在！")
         return -1
 
-    # cmd = exe_path + ' x "' + file_path + '" -o"' + dest_dir + '"'
+    # cmd = f'exe_path x "{file_path}" -o"{dest_dir}"'
     # os.system(cmd)
     call([exe_path, "x", file_path, "-o" + dest_dir])
     print("解压完成！")
@@ -293,7 +295,7 @@ def unpack_7z(exe_path, file_path, dest_dir):
 def empty_dir(dir_path, to_trash=False, whitelist: list = None):
     # 路径合法性检测
     if not os.path.isdir(dir_path):
-        print("目标目录不存在：" + dir_path)
+        print(f"目标目录不存在：{dir_path}")
         return -2
 
     if whitelist is None:
@@ -301,13 +303,13 @@ def empty_dir(dir_path, to_trash=False, whitelist: list = None):
 
     if to_trash:
         if whitelist:
-            tmp_dir = os.path.join(os.environ.get("TEMP"), "updater_whitelist_" + os.path.basename(dir_path))
+            tmp_dir = os.path.join(os.environ.get("TEMP"), f"updater_whitelist_{os.path.basename(dir_path)}")
             os.mkdir(tmp_dir)
             for item in os.listdir(dir_path):
                 if item in whitelist:
                     shutil.move(os.path.join(dir_path, item), os.path.join(tmp_dir, item))
         if send2trash(dir_path):
-            print("无法删除：" + dir_path)
+            print(f"无法删除：{dir_path}")
         else:
             os.mkdir(dir_path)
             if whitelist:
@@ -322,20 +324,20 @@ def empty_dir(dir_path, to_trash=False, whitelist: list = None):
                 try:
                     shutil.rmtree(full_path)
                 except Exception as e:
-                    print("无法删除：" + full_path)
+                    print(f"无法删除：{full_path}")
                     print(e)
             else:
                 try:
                     os.remove(full_path)
                 except Exception as e:
-                    print("无法删除：" + full_path)
+                    print(f"无法删除：{full_path}")
                     print(e)
     now_list = os.listdir(dir_path)
     if now_list and (not set(now_list).issubset(set(whitelist))):
         print("某些文件无法删除！")
         return -1
     else:
-        print("已清空：" + dir_path)
+        print(f"已清空：{dir_path}")
         if whitelist:
             print("忽略：", end="")
             print(whitelist)
@@ -347,7 +349,7 @@ def empty_dir_interact(dir_path, to_trash=False, whitelist: list = None, verbose
         whitelist = []
     if verbose:
         while True:
-            print('是否清空"%s"？(Y/N) ' % dir_path, end="")
+            print(f'是否清空"{dir_path}"？(Y/N) ', end="")
             input_confirm = input().upper()
             if input_confirm == "N":
                 return -1
