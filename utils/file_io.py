@@ -303,7 +303,9 @@ def empty_dir(dir_path, to_trash=False, whitelist: list = None):
 
     if to_trash:
         if whitelist:
-            tmp_dir = os.path.join(os.environ.get("TEMP"), f"updater_whitelist_{os.path.basename(dir_path)}")
+            tmp_dir = os.path.join(
+                os.environ.get("TEMP"), f"updater_whitelist_{os.path.basename(dir_path)}_{time.time()}"
+            )
             os.mkdir(tmp_dir)
             for item in os.listdir(dir_path):
                 if item in whitelist:
