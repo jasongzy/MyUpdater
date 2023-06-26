@@ -1,4 +1,5 @@
 import configparser
+import glob
 import os
 import shutil
 import sys
@@ -389,3 +390,8 @@ def empty_dir_interact(dir_path: str, to_trash=False, whitelist: list = None, ve
                 return 0
     else:
         return empty_dir(dir_path, to_trash, whitelist)
+
+
+def fuzzy_search_file(path_pattern: str, index=-1):
+    file_list = sorted(glob.glob(path_pattern, recursive=True))
+    return file_list[index] if file_list else ""
