@@ -139,6 +139,4 @@ cython_debug/
 
 .vscode/
 .idea/
-*.bat
-test.py
 config.ini

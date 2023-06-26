@@ -25,7 +25,7 @@ def init(check_release=True):
     if include_pre:
         try:
             include_pre = int(include_pre)
-        except:
+        except TypeError:
             print(f"[{ID}] Pre-release 开关配置有误")
             include_pre = 0
     if check_release:
@@ -48,7 +48,7 @@ def update(verbose=True):
         return -1
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:
-        print("{} {} 更新成功！".format(file_io.get_config(ID, "name", ID), app.local_version))
+        print(f"{file_io.get_config(ID, 'name', ID)} {app.local_version} 更新成功！")
         return 0
     else:
         print("校验失败，请重新下载！")

@@ -24,8 +24,8 @@ def get_scrcpy_version():
         version = out.split(" ")[1]
         if version:
             local_version = version
-    except:
-        print("未找到 scrcpy 当前版本！")
+    except (AssertionError, IndexError):
+        print("未找到 scrcpy 本地版本！")
     return local_version
 
 
@@ -40,7 +40,7 @@ def init(check_release=True):
     if include_pre:
         try:
             include_pre = int(include_pre)
-        except:
+        except TypeError:
             print(f"[{ID}] Pre-release 开关配置有误")
             include_pre = 0
     if check_release:
@@ -68,7 +68,7 @@ def update(verbose=True):
     app.local_version = get_scrcpy_version()
     if app.is_latest() == 1:
         os.remove(tmp_file)
-        print("{} {} 更新成功！".format(file_io.get_config(ID, "name", ID), app.local_version))
+        print(f"{file_io.get_config(ID, 'name', ID)} {app.local_version} 更新成功！")
         return 0
     else:
         print("校验失败，请重新下载！")

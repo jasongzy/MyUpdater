@@ -26,7 +26,7 @@ app = GitHubRelease(REPO)
 #         local_version = str(etree.HTML(changelog).xpath("/html/head/meta/@content")[0])
 #         local_version = local_version.split("/")[-1]
 #     except:
-#         print("未找到 ArchiSteamFarm 当前版本！")
+#         print("未找到 ArchiSteamFarm 本地版本！")
 #     return local_version
 
 
@@ -43,7 +43,7 @@ def init(check_release=True):
     if include_pre:
         try:
             include_pre = int(include_pre)
-        except:
+        except TypeError:
             print(f"[{ID}] Pre-release 开关配置有误")
             include_pre = 0
     if check_release:
@@ -68,7 +68,7 @@ def update(verbose=True):
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:
         os.remove(tmp_file)
-        print("{} {} 更新成功！".format(file_io.get_config(ID, "name", ID), app.local_version))
+        print(f"{file_io.get_config(ID, 'name', ID)} {app.local_version} 更新成功！")
         return 0
     else:
         print("校验失败，请重新下载！")

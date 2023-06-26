@@ -9,8 +9,8 @@ def _version_compare(a: str, b: str, split="."):
     # a > b: 1
     # a < b: -1
     # a = b: 0
-    a = "".join(list(filter(lambda x: x in "0123456789" + split, a)))
-    b = "".join(list(filter(lambda x: x in "0123456789" + split, b)))
+    a = "".join(list(filter(lambda x: x in f"0123456789{split}", a)))
+    b = "".join(list(filter(lambda x: x in f"0123456789{split}", b)))
     a_list = list(map(int, list(filter(str.isdigit, a.split(split)))))
     b_list = list(map(int, list(filter(str.isdigit, b.split(split)))))
     diff = len(a_list) - len(b_list)
@@ -25,7 +25,7 @@ def _version_compare(a: str, b: str, split="."):
     return 0
 
 
-def oauth_test(oauth_token, proxy_dict: dict = None):
+def oauth_test(oauth_token: str, proxy_dict: dict = None):
     # 0: OAuth ok
     # 1: no OAuth
     # -1: failed
@@ -44,10 +44,7 @@ def oauth_test(oauth_token, proxy_dict: dict = None):
     if response.status_code == requests.codes.ok:
         json_dict = json.loads(response.content)
         limit = json_dict["resources"]["core"]["limit"]
-        if int(limit) >= 5000:
-            return 0
-        else:
-            return 1
+        return 0 if int(limit) >= 5000 else 1
     else:
         print(f"Request failed: {response.status_code}")
         return -1
@@ -91,7 +88,7 @@ class GitHubRelease:
             if isinstance(json_dict, list):
                 json_dict = json_dict[0]
             self.latest_version = json_dict["tag_name"]
-            self.release_assets = json_dict["assets"]
+            self.release_assets: "list[dict[str, str]]" = json_dict["assets"]
             self.release_body = json_dict["body"]
             if self.release_file_name:
                 self.release_file_url = self.get_download_url()
@@ -123,11 +120,11 @@ class GitHubRelease:
     def is_latest(self, verbose=False):
         if not self.local_version:
             if verbose:
-                print("请先获取本地版本号，再进行版本比对！")
+                print("本地版本号不存在，无法进行版本比对！")
             return -1
         if not self.latest_version:
             if verbose:
-                print("请先获取最新版本号，再进行版本比对！")
+                print("最新版本号不存在，无法进行版本比对！")
             return -2
         diff = _version_compare(self.local_version, self.latest_version)
         if diff == 0:
@@ -136,7 +133,7 @@ class GitHubRelease:
             return 1
         elif diff > 0:
             if verbose:
-                print("当前版本高于最新版本！")
+                print("本地版本高于最新版本！")
             return 1
         else:
             if verbose:
@@ -151,12 +148,10 @@ class GitHubRelease:
                     print(self.release_file_url)
                 else:
                     print("未找到指定的 Release 文件！")
-            if not self.release_file_url:
-                return -2
-            return 0
+            return -2 if not self.release_file_url else 0
 
     def update_interact(self, update):
-        print(f"当前版本：{self.local_version}")
+        print(f"本地版本：{self.local_version}")
         if self.is_latest(verbose=True) == 0:
             while True:
                 print("是否下载更新？(Y/N) ", end="")

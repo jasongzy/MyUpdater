@@ -21,13 +21,13 @@ def get_prober_version():
         if item.startswith("xprober_") and (not item.endswith(".old")):
             current_filename = item
     if not current_filename:
-        print("未找到 X Prober 当前版本！")
+        print("未找到 X Prober 本地版本！")
     else:
         version = os.path.splitext(current_filename)[0].split("_")[1]
         if version:
             local_version = version
         else:
-            print("未找到 X Prober 当前版本！")
+            print("未找到 X Prober 本地版本！")
     return local_version
 
 
@@ -44,7 +44,7 @@ def init(check_release=True):
     if include_pre:
         try:
             include_pre = int(include_pre)
-        except:
+        except TypeError:
             print(f"[{ID}] Pre-release 开关配置有误")
             include_pre = 0
     if check_release:
@@ -66,7 +66,7 @@ def update(verbose=True):
         file_io.send2trash(old_file)
     app.local_version = get_prober_version()
     if app.is_latest() == 1:
-        print("{} {} 更新成功！".format(file_io.get_config(ID, "name", ID), app.local_version))
+        print(f"{file_io.get_config(ID, 'name', ID)} {app.local_version} 更新成功！")
         return 0
     else:
         print("校验失败，请重新下载！")

@@ -23,8 +23,8 @@ def get_waifu_version():
     try:
         waifu_config = file_io.read_config(os.path.join(app.local_dir, "waifu2x-extension-gui", "settings.ini"))
         local_version = waifu_config["settings"]["VERSION"]
-    except:
-        print("未找到 Waifu2x Extension GUI 当前版本！")
+    except KeyError:
+        print("未找到 Waifu2x Extension GUI 本地版本！")
     return local_version
 
 
@@ -39,7 +39,7 @@ def init(check_release=True):
     if include_pre:
         try:
             include_pre = int(include_pre)
-        except:
+        except TypeError:
             print(f"[{ID}] Pre-release 开关配置有误")
             include_pre = 0
     if check_release:
@@ -74,7 +74,7 @@ def update(verbose=True):
     app.local_version = get_waifu_version()
     if app.is_latest() == 1:
         os.remove(tmp_file)
-        print("{} {} 更新成功！".format(file_io.get_config(ID, "name", ID), app.local_version))
+        print(f"{file_io.get_config(ID, 'name', ID)} {app.local_version} 更新成功！")
         return 0
     else:
         print("校验失败，请重新下载！")

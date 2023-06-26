@@ -1,6 +1,7 @@
 import configparser
 import os
 import shutil
+import sys
 import time
 import zipfile
 from subprocess import call
@@ -11,7 +12,17 @@ import win32api
 CONFIG = {}
 
 
-def send2trash(path):
+class HiddenPrints:
+    def __enter__(self):
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, "w")
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        sys.stdout.close()
+        sys.stdout = self._original_stdout
+
+
+def send2trash(path: str) -> int:
     """https://pypi.org/project/Send2Trash"""
     from ctypes import Structure, addressof, byref, c_uint, create_unicode_buffer, windll
     from ctypes.wintypes import BOOL, HWND, LPCWSTR, UINT
@@ -54,7 +65,7 @@ def send2trash(path):
     return result  # 0 means success
 
 
-def read_config(path) -> dict:
+def read_config(path: str) -> dict:
     # 路径合法性检测
     if not os.path.isfile(path):
         print(f"配置文件不存在：{path}")
@@ -70,7 +81,7 @@ def read_config(path) -> dict:
     return config._sections
 
 
-def update_config(path):
+def update_config(path: str):
     global CONFIG
     CONFIG = read_config(path)
     if not CONFIG:
@@ -86,7 +97,7 @@ def update_config(path):
     return 0
 
 
-def get_config(section, key, default="", verbose=True):
+def get_config(section: str, key: str, default="", verbose=True) -> str:
     global CONFIG
     if section in CONFIG:
         return CONFIG[section].get(key, default)
@@ -96,7 +107,7 @@ def get_config(section, key, default="", verbose=True):
         return ""
 
 
-def terminate_process(name, verbose=False):
+def terminate_process(name: str, verbose=False):
     tasklist = "".join(os.popen(f'tasklist /FI "IMAGENAME eq {name}"').readlines())
     if "PID" in tasklist:  # 进程存在
         if verbose:
@@ -112,7 +123,7 @@ def terminate_process(name, verbose=False):
         os.system(f'taskkill /F /IM "{name}"')
 
 
-def get_exe_version(path):
+def get_exe_version(path: str):
     # 路径合法性检测
     if not os.path.isfile(path):
         print(f"目标文件不存在：{path}")
@@ -130,7 +141,7 @@ def get_exe_version(path):
     return version
 
 
-def cut_dir(src_dir, dest_dir, remove_old_dir=True):
+def cut_dir(src_dir: str, dest_dir: str, remove_old_dir=True):
     # 路径合法性检测
     if not os.path.isdir(src_dir):
         print(f"源目录不存在：{src_dir}")
@@ -148,7 +159,7 @@ def cut_dir(src_dir, dest_dir, remove_old_dir=True):
     return 0
 
 
-def downloader(url, file_path, proxy_dict: dict = None, verbose=True):
+def downloader(url: str, file_path: str, proxy_dict: dict = None, verbose=True):
     # 路径合法性检测
     dest_dir = os.path.dirname(file_path)
     if not os.path.exists(dest_dir):
@@ -232,7 +243,7 @@ def downloader(url, file_path, proxy_dict: dict = None, verbose=True):
         return -1
 
 
-def downloader_idm(exe_path, url, file_path):
+def downloader_idm(exe_path: str, url: str, file_path: str):
     # 路径合法性检测
     dest_dir = os.path.dirname(file_path)
     file_name = os.path.basename(file_path)
@@ -253,17 +264,20 @@ def downloader_idm(exe_path, url, file_path):
     return 0
 
 
-def unpack_zip(file_path, dest_dir):
+def unpack_zip(file_path: str, dest_dir: str, encoding: str = None):
     # 路径合法性检测
     if not os.path.exists(dest_dir):
         print(f"目标目录不存在：{dest_dir}")
         return -1
-
     try:
-        zfile = zipfile.ZipFile(file_path, "r")
-        zfile.extractall(path=dest_dir)
-        zfile.close()
-        print("解压成功！")
+        with zipfile.ZipFile(file_path, "r") as zfile:
+            zfile.extractall(path=dest_dir)
+            zfile.close()
+            print("解压成功！")
+            if encoding is not None:
+                filename_mapping = {name: name.encode("CP437").decode(encoding) for name in zfile.namelist()}
+                for old_name, new_name in filename_mapping.items():
+                    os.rename(os.path.join(dest_dir, old_name), os.path.join(dest_dir, new_name))
     except FileNotFoundError:
         print(f"文件不存在：{file_path}")
         return -1
@@ -276,7 +290,7 @@ def unpack_zip(file_path, dest_dir):
     return 0
 
 
-def unpack_7z(exe_path, file_path, dest_dir):
+def unpack_7z(exe_path: str, file_path: str, dest_dir: str):
     # 路径合法性检测
     if not os.path.exists(dest_dir):
         print(f"目标目录不存在：{dest_dir}")
@@ -287,12 +301,12 @@ def unpack_7z(exe_path, file_path, dest_dir):
 
     # cmd = f'exe_path x "{file_path}" -o"{dest_dir}"'
     # os.system(cmd)
-    call([exe_path, "x", file_path, "-o" + dest_dir])
+    call([exe_path, "x", file_path, f"-o{dest_dir}"])
     print("解压完成！")
     return 0
 
 
-def empty_dir(dir_path, to_trash=False, whitelist: list = None):
+def empty_dir(dir_path: str, to_trash=False, whitelist: list = None):
     # 路径合法性检测
     if not os.path.isdir(dir_path):
         print(f"目标目录不存在：{dir_path}")
@@ -346,7 +360,7 @@ def empty_dir(dir_path, to_trash=False, whitelist: list = None):
         return 0
 
 
-def empty_dir_interact(dir_path, to_trash=False, whitelist: list = None, verbose=True):
+def empty_dir_interact(dir_path: str, to_trash=False, whitelist: list = None, verbose=True):
     if whitelist is None:
         whitelist = []
     if verbose:

@@ -1,7 +1,8 @@
 import os
 import sys
-from importlib import import_module
 
+import apps
+import utils.file_io as file_io
 from PyQt5.QtCore import (
     QCoreApplication,
     QEventLoop,
@@ -24,8 +25,6 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QTableWidgetItem,
 )
-
-import utils.file_io as file_io
 from Ui_updater import Ui_MainWindow
 
 COL_LOGO = 0
@@ -351,9 +350,7 @@ if __name__ == "__main__":
         enabled = file_io.get_config(id, "enabled")
         if enabled == "0":
             ID_LIST.remove(id)
-    APP_DICT = dict(
-        zip(ID_LIST, map(lambda id: import_module("apps." + file_io.get_config(id, "module", id)), ID_LIST))
-    )
+    APP_DICT = dict(zip(ID_LIST, map(lambda id: apps.app_dict[file_io.get_config(id, "module", id)], ID_LIST)))
     NAME_DICT = dict(zip(ID_LIST, map(lambda id: file_io.get_config(id, "name", id), ID_LIST)))
     LOGO_DICT = dict(
         zip(ID_LIST, map(lambda id: os.path.join(RES_DIR, file_io.get_config(id, "logo", f"logo_{id}.png")), ID_LIST))
