@@ -13,7 +13,7 @@ from utils.github_release import GitHubRelease
 ID = "waifu"
 REPO = "AaronFeng753/Waifu2x-Extension-GUI"
 TMP_DIR = os.environ.get("TEMP")
-FILENAME = "Waifu2x-Extension-GUI-Start.bat"
+FILENAME = "Waifu2x-Extension-GUI-Start_启动.bat"
 
 app = GitHubRelease(REPO)
 
