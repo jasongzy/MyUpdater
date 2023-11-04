@@ -346,10 +346,7 @@ if __name__ == "__main__":
     ID_LIST = list(file_io.CONFIG.keys())
     ID_LIST.remove("common")
     ID_LIST.sort()
-    for id in ID_LIST:
-        enabled = file_io.get_config(id, "enabled")
-        if enabled == "0":
-            ID_LIST.remove(id)
+    ID_LIST = [id for id in ID_LIST if file_io.get_config(id, "enabled") != "0"]
     APP_DICT = dict(zip(ID_LIST, map(lambda id: apps.app_dict[file_io.get_config(id, "module", id)], ID_LIST)))
     NAME_DICT = dict(zip(ID_LIST, map(lambda id: file_io.get_config(id, "name", id), ID_LIST)))
     LOGO_DICT = dict(
