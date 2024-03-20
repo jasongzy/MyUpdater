@@ -22,7 +22,7 @@ def init(check_release=True):
         print(f'本地目录配置有误："{app.local_dir}" 不存在！')
         return
     app.exe_path = os.path.join(app.local_dir, FILENAME)
-    app.local_version = file_io.get_exe_version(app.exe_path)
+    app.local_version = file_io.get_exe_version(app.exe_path, use_product_version=True)
     include_pre = file_io.get_config(ID, "pre_release")
     if include_pre:
         try:
@@ -47,13 +47,15 @@ def update(verbose=True):
     tmp_file = os.path.join(TMP_DIR, app.release_file_name)
     if file_io.downloader(app.release_file_url, tmp_file, file_io.get_config("common", "proxy_dict"), verbose=verbose):
         return -1
+    file_io.terminate_process(FILENAME, verbose=verbose)
+    sleep(1)
     whitelist = file_io.get_config(ID, "whitelist").split(",")
     whitelist = list(map(str.strip, whitelist))
     whitelist = list(filter(None, whitelist))
     if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
         return -1
     file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
-    app.local_version = file_io.get_exe_version(app.exe_path)
+    app.local_version = file_io.get_exe_version(app.exe_path, use_product_version=True)
     if app.is_latest() == 1:
         os.remove(tmp_file)
         print(f"{file_io.get_config(ID, 'name', ID)} {app.local_version} 更新成功！")

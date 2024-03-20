@@ -124,21 +124,78 @@ def terminate_process(name: str, verbose=False):
         os.system(f'taskkill /F /IM "{name}"')
 
 
-def get_exe_version(path: str):
+def getFileProperties(fname):
+    """
+    Read all properties of the given file return them as a dictionary.
+    """
+    propNames = (
+        "Comments",
+        "InternalName",
+        "ProductName",
+        "CompanyName",
+        "LegalCopyright",
+        "ProductVersion",
+        "FileDescription",
+        "LegalTrademarks",
+        "PrivateBuild",
+        "FileVersion",
+        "OriginalFilename",
+        "SpecialBuild",
+    )
+
+    props = {"FixedFileInfo": None, "StringFileInfo": None, "FileVersion": None}
+
+    try:
+        # backslash as parm returns dictionary of numeric info corresponding to VS_FIXEDFILEINFO struc
+        fixedInfo = win32api.GetFileVersionInfo(fname, "\\")
+        props["FixedFileInfo"] = fixedInfo
+        props["FileVersion"] = "%d.%d.%d.%d" % (
+            fixedInfo["FileVersionMS"] / 65536,
+            fixedInfo["FileVersionMS"] % 65536,
+            fixedInfo["FileVersionLS"] / 65536,
+            fixedInfo["FileVersionLS"] % 65536,
+        )
+
+        # \VarFileInfo\Translation returns list of available (language, codepage)
+        # pairs that can be used to retreive string info. We are using only the first pair.
+        lang, codepage = win32api.GetFileVersionInfo(fname, "\\VarFileInfo\\Translation")[0]
+
+        # any other must be of the form \StringfileInfo\%04X%04X\parm_name, middle
+        # two are language/codepage pair returned from above
+
+        strInfo = {}
+        for propName in propNames:
+            strInfoPath = "\\StringFileInfo\\%04X%04X\\%s" % (lang, codepage, propName)
+            ## print str_info
+            strInfo[propName] = win32api.GetFileVersionInfo(fname, strInfoPath)
+
+        props["StringFileInfo"] = strInfo
+    except:
+        pass
+
+    return props
+
+
+def get_exe_version(path: str, use_product_version=False):
     # 路径合法性检测
     if not os.path.isfile(path):
         print(f"目标文件不存在：{path}")
         return "0.0.0.0"
 
     try:
-        info = win32api.GetFileVersionInfo(path, os.sep)
+        # info = win32api.GetFileVersionInfo(path, os.sep)
+        info = getFileProperties(path)
     except Exception as e:
         print(e)
         return "0.0.0.0"
 
-    ms = info["FileVersionMS"]
-    ls = info["FileVersionLS"]
-    version = "{}.{}.{}.{}".format(win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls))
+    if use_product_version:
+        version = info["StringFileInfo"]["ProductVersion"]
+    else:
+        # ms = info["FileVersionMS"]
+        # ls = info["FileVersionLS"]
+        # version = "{}.{}.{}.{}".format(win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls), win32api.LOWORD(ls))
+        version = info["FileVersion"]
     return version
 
 
@@ -232,7 +289,9 @@ def downloader(url: str, file_path: str, proxy_dict: dict = None, verbose=True):
                         if "percent_10x_last" not in dir():  # 未定义变量（第一次循环）
                             percent_10x_last = -1
                         if percent_10x % 100 == 0 and percent_10x != percent_10x_last:
-                            print("\r" + "[下载进度]: {}{:.2f}%".format(">" * int(size * 50 / file_size), percent), end="")
+                            print(
+                                "\r" + "[下载进度]: {}{:.2f}%".format(">" * int(size * 50 / file_size), percent), end=""
+                            )
                             percent_10x_last = percent_10x
 
         end_time = time.time()
