@@ -65,6 +65,10 @@ def update(verbose=True):
     if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
         return -1
     file_io.unpack_zip(tmp_file, app.local_dir)
+    file_io.cut_dir(
+        os.path.join(app.local_dir, f"{os.path.basename(app.local_dir)}-{app.latest_version}"),
+        app.local_dir,
+    )
     app.local_version = get_scrcpy_version()
     if app.is_latest() == 1:
         os.remove(tmp_file)
