@@ -6,9 +6,11 @@ GITHUB_API = "https://api.github.com"
 
 
 def _version_compare(a: str, b: str, split="."):
-    # a > b: 1
-    # a < b: -1
-    # a = b: 0
+    """
+    a > b: 1
+    a < b: -1
+    a = b: 0
+    """
     a = "".join(list(filter(lambda x: x in f"0123456789{split}", a)))
     b = "".join(list(filter(lambda x: x in f"0123456789{split}", b)))
     a_list = list(map(int, list(filter(str.isdigit, a.split(split)))))
@@ -26,9 +28,11 @@ def _version_compare(a: str, b: str, split="."):
 
 
 def oauth_test(oauth_token: str, proxy_dict: dict = None):
-    # 0: OAuth ok
-    # 1: no OAuth
-    # -1: failed
+    """
+    0: OAuth ok
+    1: no OAuth
+    -1: failed
+    """
     api = f"{GITHUB_API}/rate_limit"
     headers = {"Authorization": f"token {oauth_token}"}
     if proxy_dict is None:
@@ -147,7 +151,7 @@ class GitHubRelease:
                     print(f"其中 {self.release_file_name} 的下载链接为：")
                     print(self.release_file_url)
                 else:
-                    print("未找到指定的 Release 文件！")
+                    print(f"未找到指定的 Release 文件！（{self.release_file_name}）")
             return -2 if not self.release_file_url else 0
 
     def update_interact(self, update):

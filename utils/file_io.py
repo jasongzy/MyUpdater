@@ -332,7 +332,6 @@ def unpack_zip(file_path: str, dest_dir: str, encoding: str = None):
     try:
         with zipfile.ZipFile(file_path, "r") as zfile:
             zfile.extractall(path=dest_dir)
-            zfile.close()
             print("解压成功！")
             if encoding is not None:
                 filename_mapping = {name: name.encode("CP437").decode(encoding) for name in zfile.namelist()}
