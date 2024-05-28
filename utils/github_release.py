@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 
@@ -111,14 +112,24 @@ class GitHubRelease:
                 return item["browser_download_url"]
         return ""
 
-    def get_download_url(self, fuzzy=False, ext=""):
-        if fuzzy:
+    def get_download_url(self, version_replace=False, fuzzy=False, ext: str = None, placeholder="$"):
+        if fuzzy:  # 实际版本号与文件名并不总是一致，可以采用模糊查找
             for item in self.release_assets:
-                if item["name"].startswith(self.release_file_name) and (ext == "" or item["name"].endswith(f".{ext}")):
+                if ext is None:
+                    ext = os.path.splitext(self.release_file_name)[-1]
+                    release_file_name_prefix = self.release_file_name.split(placeholder, 1)[0]
+                if ext.startswith("."):
+                    ext = ext[1:]
+                if item["name"].startswith(release_file_name_prefix) and item["name"].endswith(f".{ext}"):
                     self.release_file_name = item["name"]
                     return item["browser_download_url"]
             return ""
         else:
+            if version_replace:  # Release 文件名包含版本号，在配置文件中用符号代替
+                latest_version = self.latest_version
+                if latest_version.startswith("v"):
+                    latest_version = latest_version[1:]
+                self.release_file_name = self.release_file_name.replace(placeholder, latest_version)
             return self.get_download_url_by(self.release_file_name, "name")
 
     def is_latest(self, verbose=False):

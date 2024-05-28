@@ -49,10 +49,8 @@ def init(check_release=True):
             file_io.get_config("common", "proxy_dict"),
             file_io.get_config("common", "github_oauth"),
         )
-        # Release 文件名包含版本号
-        # 在配置文件中用$代替
-        app.release_file_name = file_io.get_config(ID, "release_file").replace("$", app.latest_version)
-        app.release_file_url = app.get_download_url()
+        app.release_file_name = file_io.get_config(ID, "release_file")
+        app.release_file_url = app.get_download_url(version_replace=True)
 
 
 def update(verbose=True):
@@ -64,7 +62,7 @@ def update(verbose=True):
     whitelist = list(filter(None, whitelist))
     if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
         return -1
-    file_io.unpack_zip(tmp_file, app.local_dir)
+    file_io.unpack(tmp_file, app.local_dir)
     file_io.cut_dir(
         os.path.join(app.local_dir, f"{os.path.basename(app.local_dir)}-{app.latest_version}"),
         app.local_dir,

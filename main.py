@@ -281,7 +281,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             latest_version.setIcon(QIcon(os.path.join(RES_DIR, "error.svg")))
             self.update_button_dict[item].setEnabled(False)
             # self.set_row_background_color(row_index, 250, 214, 214)
-            print(f"{NAME_DICT[item]}：无法找到最新版本下载地址！")
+            print(f"{NAME_DICT[item]}：无法找到最新版本下载地址！（{app.release_file_name}）")
 
         self.counter.setText(
             f'<html><head/><body><p><span style=" color:#fe4365;">{self.counter_num}</span></p></body></html>'

@@ -63,7 +63,7 @@ def update(verbose=True):
     whitelist = list(filter(None, whitelist))
     if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
         return -1
-    file_io.unpack_zip(tmp_file, app.local_dir)
+    file_io.unpack(tmp_file, app.local_dir)
     # app.local_version = get_asf_version()
     app.local_version = file_io.get_exe_version(app.exe_path)
     if app.is_latest() == 1:

@@ -59,11 +59,8 @@ def init(check_release=True):
             file_io.get_config("common", "proxy_dict"),
             file_io.get_config("common", "github_oauth"),
         )
-        # Release 文件名包含版本号
-        # 在配置文件中用$代替
-        # !但实际版本号与文件名并不总是一致，因此采用模糊查找
-        app.release_file_name = file_io.get_config(ID, "release_file").split("$", 1)[0]
-        app.release_file_url = app.get_download_url(fuzzy=True, ext="zip")
+        app.release_file_name = file_io.get_config(ID, "release_file")
+        app.release_file_url = app.get_download_url(fuzzy=True)
 
 
 def update(verbose=True):
@@ -79,7 +76,7 @@ def update(verbose=True):
         print(f"备份 {lib_path} 成功！")
     else:
         print("未找到文件：", lib_path)
-    file_io.unpack_zip(tmp_file, app.local_dir)
+    file_io.unpack(tmp_file, app.local_dir)
     lib_path_unzip = os.path.join(app.local_dir, "Calibre2", LIB_PATH)
     os.rename(lib_path_unzip, lib_path)
     os.removedirs(os.path.dirname(lib_path_unzip))

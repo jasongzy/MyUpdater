@@ -34,10 +34,8 @@ def init(check_release=True):
             file_io.get_config("common", "proxy_dict"),
             file_io.get_config("common", "github_oauth"),
         )
-        # Release 文件名包含版本号
-        # 在配置文件中用$代替
-        app.release_file_name = file_io.get_config(ID, "release_file").replace("$", str(app.latest_version[1:]))
-        app.release_file_url = app.get_download_url()
+        app.release_file_name = file_io.get_config(ID, "release_file")
+        app.release_file_url = app.get_download_url(version_replace=True)
 
 
 def update(verbose=True):

@@ -35,11 +35,8 @@ def init(check_release=True):
             file_io.get_config("common", "proxy_dict"),
             file_io.get_config("common", "github_oauth"),
         )
-        # Release 文件名包含版本号
-        # 在配置文件中用$代替
-        # !但实际版本号与文件名并不总是一致，因此采用模糊查找
-        app.release_file_name = file_io.get_config(ID, "release_file").split("$", 1)[0]
-        app.release_file_url = app.get_download_url(fuzzy=True, ext="7z")
+        app.release_file_name = file_io.get_config(ID, "release_file")
+        app.release_file_url = app.get_download_url(fuzzy=True)
 
 
 def update(verbose=True):
@@ -51,7 +48,7 @@ def update(verbose=True):
     whitelist = list(filter(None, whitelist))
     if file_io.empty_dir_interact(app.local_dir, True, whitelist, verbose=verbose) != 0:
         return -1
-    file_io.unpack_7z(file_io.get_config("common", "7z_path"), tmp_file, app.local_dir)
+    file_io.unpack(tmp_file, app.local_dir)
     file_io.cut_dir(
         os.path.join(app.local_dir, "Office Tool"),
         app.local_dir,

@@ -3,6 +3,7 @@ import glob
 import os
 import shutil
 import sys
+import tarfile
 import time
 import zipfile
 from subprocess import call
@@ -324,7 +325,21 @@ def downloader_idm(exe_path: str, url: str, file_path: str):
     return 0
 
 
-def unpack_zip(file_path: str, dest_dir: str, encoding: str = None):
+def unpack(file_path: str, dest_dir: str, *args, **kwargs):
+    if file_path.endswith(".zip"):
+        return unpack_zip(file_path, dest_dir, *args, **kwargs)
+    elif file_path.endswith(".tar.gz"):
+        return unpack_tz(file_path, dest_dir, *args, **kwargs)
+    # elif file_path.endswith(".7z"):
+    else:
+        if not file_path.endswith(".7z"):
+            print(f"正在使用 7-Zip 解压非 '.7z' 文件：{file_path}")
+        return unpack_7z(file_path, dest_dir, *args, exe_path=get_config("common", "7z_path"), **kwargs)
+    # else:
+    #     raise NotImplementedError(os.path.splitext(file_path)[-1])
+
+
+def unpack_zip(file_path: str, dest_dir: str, encoding: str = None, *args, **kwargs):
     # 路径合法性检测
     if not os.path.exists(dest_dir):
         print(f"目标目录不存在：{dest_dir}")
@@ -349,19 +364,40 @@ def unpack_zip(file_path: str, dest_dir: str, encoding: str = None):
     return 0
 
 
-def unpack_7z(exe_path: str, file_path: str, dest_dir: str):
+def unpack_tz(file_path: str, dest_dir: str, *args, **kwargs):
+    # 路径合法性检测
+    if not os.path.exists(dest_dir):
+        print(f"目标目录不存在：{dest_dir}")
+        return -1
+    try:
+        with tarfile.open(file_path, "r:gz") as zfile:
+            zfile.extractall(path=dest_dir)
+            print("解压成功！")
+    except FileNotFoundError:
+        print(f"文件不存在：{file_path}")
+        return -1
+    except tarfile.TarError:
+        print(f"文件损坏：{file_path}")
+        return -1
+    except Exception as e:
+        print(e)
+        return -1
+    return 0
+
+
+def unpack_7z(file_path: str, dest_dir: str, exe_path: str, *args, **kwargs):
     # 路径合法性检测
     if not os.path.exists(dest_dir):
         print(f"目标目录不存在：{dest_dir}")
         return -1
     if not os.path.exists(exe_path):
-        print("7z.exe 不存在！")
+        print(f"7z.exe 不存在：{exe_path}")
         return -1
 
     # cmd = f'exe_path x "{file_path}" -o"{dest_dir}"'
     # os.system(cmd)
     call([exe_path, "x", file_path, f"-o{dest_dir}"])
-    print("解压完成！")
+    print("解压成功！")
     return 0
 
 
