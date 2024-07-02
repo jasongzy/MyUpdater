@@ -50,7 +50,7 @@ def init(check_release=True):
             file_io.get_config("common", "github_oauth"),
         )
         app.release_file_name = file_io.get_config(ID, "release_file")
-        app.release_file_url = app.get_download_url(version_replace=True)
+        app.release_file_url = app.get_download_url(version_replace=True, keep_v=True)
 
 
 def update(verbose=True):

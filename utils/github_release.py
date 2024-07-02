@@ -112,7 +112,7 @@ class GitHubRelease:
                 return item["browser_download_url"]
         return ""
 
-    def get_download_url(self, version_replace=False, fuzzy=False, ext: str = None, placeholder="$"):
+    def get_download_url(self, version_replace=False, fuzzy=False, ext: str = None, placeholder="$", keep_v=False):
         if fuzzy:  # 实际版本号与文件名并不总是一致，可以采用模糊查找
             for item in self.release_assets:
                 if ext is None:
@@ -127,7 +127,7 @@ class GitHubRelease:
         else:
             if version_replace:  # Release 文件名包含版本号，在配置文件中用符号代替
                 latest_version = self.latest_version
-                if latest_version.startswith("v"):
+                if latest_version.startswith("v") and not keep_v:
                     latest_version = latest_version[1:]
                 self.release_file_name = self.release_file_name.replace(placeholder, latest_version)
             return self.get_download_url_by(self.release_file_name, "name")
