@@ -24,8 +24,8 @@ def get_mimikatz_version():
             version = f.readline().replace("\n", "")
             if version:
                 local_version = version
-    except:
-        print("未找到 mimikatz 本地版本！")
+    except Exception as e:
+        print(f"{path} 读取失败: {e}")
     return local_version
 
 
@@ -34,8 +34,8 @@ def write_mimikatz_version(version: str):
     try:
         with open(path, "w") as f:
             f.write(version)
-    except:
-        print("mimikatz 版本写入失败！")
+    except Exception as e:
+        print(f"{path} 写入失败：{e}")
 
 
 def init(check_release=True):

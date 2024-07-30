@@ -330,6 +330,8 @@ def unpack(file_path: str, dest_dir: str, *args, **kwargs):
         return unpack_zip(file_path, dest_dir, *args, **kwargs)
     elif file_path.endswith(".tar.gz"):
         return unpack_tz(file_path, dest_dir, *args, **kwargs)
+    elif file_path.endswith(".exe"):
+        return unpack_7z_exe(file_path, dest_dir, *args, **kwargs)
     # elif file_path.endswith(".7z"):
     else:
         if not file_path.endswith(".7z"):
@@ -396,7 +398,18 @@ def unpack_7z(file_path: str, dest_dir: str, exe_path: str, *args, **kwargs):
 
     # cmd = f'exe_path x "{file_path}" -o"{dest_dir}"'
     # os.system(cmd)
-    call([exe_path, "x", file_path, f"-o{dest_dir}"])
+    call([exe_path, "x", file_path, f"-o{dest_dir}", "-y"])
+    print("解压成功！")
+    return 0
+
+
+def unpack_7z_exe(file_path: str, dest_dir: str, *args, **kwargs):
+    # 路径合法性检测
+    if not os.path.exists(dest_dir):
+        print(f"目标目录不存在：{dest_dir}")
+        return -1
+
+    call([file_path, f"-o{dest_dir}", "-y"])
     print("解压成功！")
     return 0
 
