@@ -10,7 +10,7 @@ from utils.github_release import GitHubRelease
 ID = "mimikatz"
 REPO = "gentilkiwi/mimikatz"
 TMP_DIR = os.environ.get("TEMP")
-FILENAME = "x64\mimikatz.exe"
+FILENAME = "x64/mimikatz.exe"
 
 app = GitHubRelease(REPO)
 
