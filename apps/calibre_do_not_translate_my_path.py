@@ -7,7 +7,7 @@ from utils.github_release import GitHubRelease
 
 # https://github.com/Cirn09/calibre-do-not-translate-my-path
 
-ID = "calibre"
+ID = "calibre_dntmp"
 REPO = "Cirn09/calibre-do-not-translate-my-path"
 TMP_DIR = os.environ.get("TEMP")
 FILENAME = "calibre.exe"
