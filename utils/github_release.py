@@ -69,6 +69,8 @@ class GitHubRelease:
     release_body = ""
     release_file_url = ""
 
+    version_str_processor = None
+
     def __init__(self, repo: str):
         self.repo = repo
         self.repo_url = f"https://github.com/{repo}"
@@ -139,7 +141,12 @@ class GitHubRelease:
             if verbose:
                 print("最新版本号不存在，无法进行版本比对！")
             return -2
-        diff = _version_compare(self.local_version, self.latest_version)
+        if self.version_str_processor is None:
+            diff = _version_compare(self.local_version, self.latest_version)
+        else:
+            diff = _version_compare(
+                self.version_str_processor(self.local_version), self.version_str_processor(self.latest_version)
+            )
         if diff == 0:
             if verbose:
                 print("已为最新版本！")
