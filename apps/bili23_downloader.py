@@ -16,28 +16,13 @@ FILENAME = "Bili23.exe"
 app = GitHubRelease(REPO)
 
 
-def get_bili23_version(local_dir):
-    config_path = os.path.join(local_dir, "script", "util", "common", "config.py")
-    if not os.path.isfile(config_path):
-        return ""
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            for line in f:
-                match = re.search(r'app_version\s*=\s*["\']([^"\']+)["\']', line)
-                if match:
-                    return match.group(1)
-    except Exception as e:
-        print(f"读取版本号时出错: {e}")
-    return ""
-
-
 def init(check_release=True):
     app.local_dir = file_io.get_config(ID, "path")
     if not os.path.isdir(app.local_dir):
         print(f'本地目录配置有误："{app.local_dir}" 不存在！')
         return
     app.exe_path = os.path.join(app.local_dir, FILENAME)
-    app.local_version = get_bili23_version(app.local_dir)
+    app.local_version = file_io.get_exe_version(app.exe_path)
     include_pre = file_io.get_config(ID, "pre_release")
     if include_pre:
         try:
