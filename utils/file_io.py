@@ -64,7 +64,7 @@ def send2trash(path: str) -> int:
     fileop.hNameMappings = 0
     fileop.lpszProgressTitle = None
     result = SHFileOperationW(byref(fileop))
-    return result  # 0 means success
+    return result or int(fileop.fAnyOperationsAborted)
 
 
 def read_config(path: str) -> dict:
@@ -218,7 +218,7 @@ def cut_dir(src_dir: str, dest_dir: str, remove_old_dir=True):
     return 0
 
 
-def downloader(url: str, file_path: str, proxy_dict: dict = None, verbose=True):
+def downloader(url: str, file_path: str, proxy_dict: dict = None, verbose=True, *, overwrite: bool = False):
     # 路径合法性检测
     dest_dir = os.path.dirname(file_path)
     if not os.path.exists(dest_dir):
@@ -230,7 +230,7 @@ def downloader(url: str, file_path: str, proxy_dict: dict = None, verbose=True):
     if proxy_dict is None:
         proxy_dict = {}
     if verbose:
-        if os.path.isfile(file_path):
+        if os.path.isfile(file_path) and not overwrite:
             while True:
                 print("目标文件已存在，是否覆盖？(Y/N) ", end="")
                 input_confirm = input().upper()
