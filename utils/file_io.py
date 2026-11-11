@@ -2,6 +2,7 @@ import configparser
 import glob
 import os
 import shutil
+import stat
 import sys
 import tarfile
 import time
@@ -200,7 +201,7 @@ def get_exe_version(path: str, use_product_version=False):
     return version
 
 
-def cut_dir(src_dir: str, dest_dir: str, remove_old_dir=True):
+def cut_dir(src_dir: str, dest_dir: str, remove_old_dir: bool = True) -> int:
     # 路径合法性检测
     if not os.path.isdir(src_dir):
         print(f"源目录不存在：{src_dir}")
@@ -213,8 +214,10 @@ def cut_dir(src_dir: str, dest_dir: str, remove_old_dir=True):
         full_path = os.path.join(src_dir, item)
         shutil.move(full_path, dest_dir)
     if remove_old_dir:
-        # shutil.rmtree(src_path)
-        os.removedirs(src_dir)
+        mode = os.stat(src_dir).st_mode
+        if not mode & stat.S_IWRITE:
+            os.chmod(src_dir, mode | stat.S_IWRITE)
+        os.rmdir(src_dir)
     return 0
 
 
