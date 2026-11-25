@@ -57,7 +57,7 @@ def update(verbose: bool = True) -> int:
             if os.path.exists(tmp_file):
                 os.remove(tmp_file)
     except OSError as e:
-        print(f"Argus 更新失败：{e}")
+        print(f"{file_io.get_config(ID, 'name', ID)} 更新失败：{e}")
         return -1
     print(f"{file_io.get_config(ID, 'name', ID)} {app.local_version} 更新成功！")
     return 0
